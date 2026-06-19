@@ -576,6 +576,7 @@ function SlotSection({
                   }`}
                 >
                   <span className="arravpos-slot-time">{slot.start_time}</span>
+                  
                   <span className="arravpos-slot-status">
                     {slot.disabled
                       ? ""
