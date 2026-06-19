@@ -321,6 +321,7 @@ export interface Slot {
   startUtc: string;
   endUtc: string;
   isBooked: boolean;
+  disabled: boolean;
   source: "WEEKLY" | "CUSTOM" | string;
   createdAt: string;
   updatedAt: string;
@@ -775,6 +776,7 @@ export interface SlotItem {
   startUtc: string;
   endUtc: string;
   isBooked: boolean;
+  disabled: boolean;
   source: "WEEKLY" | "CUSTOM" | string;
   createdAt: string;
   updatedAt: string;

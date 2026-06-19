@@ -28,12 +28,24 @@ import CalendarOverlay from "@/components/common/CalendarOverlay";
 import type { AppDispatch } from "@/store";
 import { isDateDisabled } from "@/utils/isDateDisabled";
 
-const MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const MONTH_NAMES = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
 const WEEK_DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const SLOT_INTERVAL = 15;
 
 export default function TimePage(): JSX.Element {
-
   const dispatch = useDispatch<AppDispatch>();
   const [visibleCount, setVisibleCount] = useState<number>(11);
   const { staff, selectedServices, selectedProfessional } = useSelector(
@@ -44,7 +56,8 @@ export default function TimePage(): JSX.Element {
     (state: OutletRootState) => state.booking?.outletDetails,
   );
 
-  const { selectedSlotIndexes, selectedDate, selectedTime, slots, loading } = useSelector((state: OutletRootState) => state.booking.slots);
+  const { selectedSlotIndexes, selectedDate, selectedTime, slots, loading } =
+    useSelector((state: OutletRootState) => state.booking.slots);
   const [calOpen, setCalOpen] = useState<boolean>(false);
   const [stripStart, setStripStart] = useState<number>(0);
   const allSlots = useMemo(() => {
@@ -94,10 +107,15 @@ export default function TimePage(): JSX.Element {
     });
   }, [selectedProfessional, staff, selectedServices]);
 
-  const totalDuration = selectedStaffServices.reduce((sum, s) => sum + Number(s.duration) * (s.qty || 1), 0,);
+  const totalDuration = selectedStaffServices.reduce(
+    (sum, s) => sum + Number(s.duration) * (s.qty || 1),
+    0,
+  );
   const durationMins = totalDuration;
   const requiredSlots = Math.ceil(durationMins / SLOT_INTERVAL);
-  const formattedDate = selectedDate ? DateTime.fromObject(selectedDate).toFormat("yyyy-MM-dd") : null;
+  const formattedDate = selectedDate
+    ? DateTime.fromObject(selectedDate).toFormat("yyyy-MM-dd")
+    : null;
 
   useEffect(() => {
     if (!selectedProfessional?.id || !formattedDate) return;
@@ -168,18 +186,26 @@ export default function TimePage(): JSX.Element {
 
   const handleSlotSelect = (selectedIndex: number): void => {
     if (!allSlots.length) return;
-    const selectedGroup = allSlots.slice(selectedIndex, selectedIndex + requiredSlots);
+    const selectedGroup = allSlots.slice(
+      selectedIndex,
+      selectedIndex + requiredSlots,
+    );
     if (selectedGroup.length < requiredSlots) {
       toast.warning("You don't have sufficient time for selected service");
       return;
     }
-    const hasBlocked = selectedGroup.some((s) => s.isBooked || s.status !== "AVAILABLE");
+    const hasBlocked = selectedGroup.some(
+      (s) => s.isBooked || s.status !== "AVAILABLE" || s.disabled,
+    );
     if (hasBlocked) {
       toast.warning("Selected time range is not fully available");
       return;
     }
     dispatch(setSelectedTime(allSlots[selectedIndex].start_time));
-    const indexes = Array.from({ length: requiredSlots }, (_, i) => selectedIndex + i);
+    const indexes = Array.from(
+      { length: requiredSlots },
+      (_, i) => selectedIndex + i,
+    );
     const ids = indexes.map((i) => allSlots[i]?.id);
     dispatch(setSelectedSlots({ indexes, ids }));
     setTimeout(() => {
@@ -197,13 +223,14 @@ export default function TimePage(): JSX.Element {
       { length: requiredSlots },
       (_, i) => startIndex + i,
     );
-    const isSame = restoredIndexes.length === selectedSlotIndexes.length && restoredIndexes.every((val, i) => val === selectedSlotIndexes[i]);
+    const isSame =
+      restoredIndexes.length === selectedSlotIndexes.length &&
+      restoredIndexes.every((val, i) => val === selectedSlotIndexes[i]);
     if (!isSame) {
       const ids = restoredIndexes.map((i) => allSlots[i]?.id);
-      dispatch(setSelectedSlots({ indexes: restoredIndexes, ids, }));
+      dispatch(setSelectedSlots({ indexes: restoredIndexes, ids }));
     }
   }, [selectedTime, allSlots, requiredSlots, selectedSlotIndexes]);
-
 
   useEffect(() => {
     const updateCount = (): void => {
@@ -229,7 +256,10 @@ export default function TimePage(): JSX.Element {
   const pmSlots = slots?.afternoon || [];
   const evSlots = slots?.evening || [];
 
-  const hasAvailable = (slotsArr: Slot[]): boolean => slotsArr.some((s) => !s.isBooked && s.status === "AVAILABLE");
+  const hasAvailable = (slotsArr: Slot[]): boolean =>
+    slotsArr.some(
+      (s) => !s.isBooked && s.status === "AVAILABLE" && !s.disabled,
+    );
 
   const getDefaultOpenSection = (): string | null => {
     if (hasAvailable(amSlots)) return "morning";
@@ -238,7 +268,9 @@ export default function TimePage(): JSX.Element {
     return null;
   };
 
-  const [openSection, setOpenSection] = useState<string | null>(getDefaultOpenSection());
+  const [openSection, setOpenSection] = useState<string | null>(
+    getDefaultOpenSection(),
+  );
 
   const setNextSlotDate = (): void => {
     let nextAvailableDate: DateTime | null = null;
@@ -285,7 +317,10 @@ export default function TimePage(): JSX.Element {
   }, [selectedSlotIndexes, allSlots, amSlots, pmSlots, evSlots]);
 
   useEffect(() => {
-    const hasAvailable = (slotsArr: Slot[]): boolean => slotsArr?.some((s) => !s.isBooked && s.status === "AVAILABLE");
+    const hasAvailable = (slotsArr: Slot[]): boolean =>
+      slotsArr.some(
+        (s) => !s.isBooked && s.status === "AVAILABLE" && !s.disabled,
+      );
     const noSlotsAvailable =
       !hasAvailable(amSlots) &&
       !hasAvailable(pmSlots) &&
@@ -330,7 +365,10 @@ export default function TimePage(): JSX.Element {
             const dow = dt.weekday % 7;
             const today = DateTime.now().setZone(timeZone).startOf("day");
             const isToday = dt.hasSame(today, "day");
-            const isSelected = selectedDate?.day === d.day && selectedDate?.month === d.month && selectedDate?.year === d.year;
+            const isSelected =
+              selectedDate?.day === d.day &&
+              selectedDate?.month === d.month &&
+              selectedDate?.year === d.year;
             const isDisabled = isDateDisabled({
               dateObj: d,
               selectedProfessional,
@@ -344,12 +382,16 @@ export default function TimePage(): JSX.Element {
                     handlePickDate(d);
                   }
                 }}
-                className={["arravpos-date-card", isDisabled
-                  ? "arravpos-date-card-disabled"
-                  : isSelected
-                    ? "arravpos-date-card-active"
-                    : "arravpos-date-card-default",
-                ].filter(Boolean).join(" ")}
+                className={[
+                  "arravpos-date-card",
+                  isDisabled
+                    ? "arravpos-date-card-disabled"
+                    : isSelected
+                      ? "arravpos-date-card-active"
+                      : "arravpos-date-card-default",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
               >
                 {isDisabled && <div className="arravpos-date-disabled-slash" />}
                 <span className="arravpos-date-week">{WEEK_DAYS[dow]}</span>
@@ -386,7 +428,10 @@ export default function TimePage(): JSX.Element {
             className="arravpos-selected-professional-image"
           />
         ) : (
-          <div className="arravpos-selected-professional-avatar" style={{ background: selectedProfessional?.color || "#111", }}>
+          <div
+            className="arravpos-selected-professional-avatar"
+            style={{ background: selectedProfessional?.color || "#111" }}
+          >
             {getUserName(selectedProfessional?.name)}
           </div>
         )}
@@ -400,7 +445,10 @@ export default function TimePage(): JSX.Element {
           </p>
         </div>
       </div>
-      <div className="arravpos-scroll-area" style={loading ? { height: 300 } : {}}>
+      <div
+        className="arravpos-scroll-area"
+        style={loading ? { height: 300 } : {}}
+      >
         {loading ? (
           <div className="arravpos-loader-wrapper">
             <div className="arravpos-loader" />
@@ -493,7 +541,9 @@ function SlotSection({
         <div className="arravpos-slot-section-title">
           <span>{icon}</span> {label}
         </div>
-        <span className={`arravpos-slot-section-arrow ${isOpen ? "arravpos-slot-section-arrow-open" : ""}`}>
+        <span
+          className={`arravpos-slot-section-arrow ${isOpen ? "arravpos-slot-section-arrow-open" : ""}`}
+        >
           <ChevronDown />
         </span>
       </div>
@@ -505,18 +555,34 @@ function SlotSection({
                 (s: SlotItem) => s.id === slot.id,
               );
               const isSelected = selectedSlotIndexes.includes(globalIndex);
-              const isDisabled = slot.isBooked || slot.status !== "AVAILABLE";
+              const isOnBreak = slot.disabled;
+
+              const isDisabled =
+                slot.isBooked || slot.status !== "AVAILABLE" || isOnBreak;
               return (
                 <div
                   key={slot.id}
-                  onClick={() => { if (!isDisabled) { handleSlotSelect(globalIndex) } }}
-                  className={`arravpos-slot-card ${isDisabled
-                    ? "arravpos-slot-card-disabled"
-                    : isSelected ? "arravpos-slot-card-selected" : "arravpos-slot-card-default"
-                    }`}
+                  onClick={() => {
+                    if (!isDisabled) {
+                      handleSlotSelect(globalIndex);
+                    }
+                  }}
+                  className={`arravpos-slot-card ${
+                    isDisabled
+                      ? "arravpos-slot-card-disabled"
+                      : isSelected
+                        ? "arravpos-slot-card-selected"
+                        : "arravpos-slot-card-default"
+                  }`}
                 >
                   <span className="arravpos-slot-time">{slot.start_time}</span>
-                  <span className="arravpos-slot-status">{isDisabled ? "Booked" : "Available"}</span>
+                  <span className="arravpos-slot-status">
+                    {slot.disabled
+                      ? ""
+                      : slot.isBooked
+                        ? "Booked"
+                        : "Available"}
+                  </span>
                 </div>
               );
             })}
