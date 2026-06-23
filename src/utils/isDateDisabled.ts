@@ -17,13 +17,18 @@ export const isDateDisabled = ({
 }: IsDateDisabledProps): boolean => {
   if (!selectedProfessional) return false;
 
-  const dt = DateTime.fromISO(dateObj.fullDate || "").setZone(outletTimeZone);
+  const dt = DateTime.fromObject(
+    {
+      year: dateObj.year,
+      month: dateObj.month,
+      day: dateObj.day,
+    },
+    {
+      zone: outletTimeZone,
+    },
+  );
 
-  const currentDate = dt.toFormat("yyyy-MM-dd");
-
-  /* =========================
-     1. STAFF LEAVE DATES
-  ========================= */
+  const currentDate = dt.toISODate();
 
   const leaveDates = selectedProfessional?.futureLeaveDates || [];
 
@@ -36,24 +41,20 @@ export const isDateDisabled = ({
 
     if (!leaveDate) return false;
 
-    const formattedLeaveDate =
-      DateTime.fromISO(leaveDate).toFormat("yyyy-MM-dd");
-
-    return formattedLeaveDate === currentDate;
+    return (
+      DateTime.fromISO(leaveDate, { zone: "utc" }).toISODate() === currentDate
+    );
   });
 
   if (isOnLeave) return true;
 
-  /* =========================
-     2. DATE OVERRIDES
-  ========================= */
-
   const overrides = selectedProfessional?.dateOverrides || [];
 
   const matchingOverride = overrides.find((override) => {
-    const overrideDate = DateTime.fromISO(override.date).toFormat("yyyy-MM-dd");
-
-    return overrideDate === currentDate;
+    return (
+      DateTime.fromISO(override.date, { zone: "utc" }).toISODate() ===
+      currentDate
+    );
   });
 
   if (matchingOverride?.type === "CLOSED") {
@@ -63,10 +64,6 @@ export const isDateDisabled = ({
   if (matchingOverride?.type === "TIME") {
     return false;
   }
-
-  /* =========================
-     3. WEEKLY HOURS
-  ========================= */
 
   const weeklyJson = selectedProfessional?.weeklyHours?.weeklyJson || {};
 
@@ -84,9 +81,5 @@ export const isDateDisabled = ({
 
   const dayConfig = weeklyJson?.[weekdayKey];
 
-  if (!dayConfig || dayConfig.isClosed) {
-    return true;
-  }
-
-  return false;
+  return !dayConfig || Boolean(dayConfig.isClosed);
 };
