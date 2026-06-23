@@ -772,6 +772,7 @@ export interface SlotItem {
   date: string;
   day: string;
   start_time: string;
+  start_time_12h: string;
   end_time: string;
   startUtc: string;
   endUtc: string;

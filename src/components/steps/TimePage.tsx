@@ -63,33 +63,44 @@ export default function TimePage(): JSX.Element {
   const allSlots = useMemo(() => {
     return [slots.morning, slots.afternoon, slots.evening].flat();
   }, [slots]);
-  const startDate = useMemo(() => DateTime.now().setZone(timeZone), [timeZone]);
+  const startDate = useMemo(
+    () => DateTime.now().setZone(timeZone).startOf("day"),
+    [timeZone],
+  );
 
-  const generateDates = (sdate: DateTime): DateItem[] => {
+  const endDate = useMemo(
+    () => startDate.plus({ months: 3 }).minus({ days: 1 }),
+    [startDate],
+  );
+
+  const generateDates = (sdate: DateTime, edate: DateTime): DateItem[] => {
     try {
-      const totalDays = 180;
-      if (!sdate.isValid) {
-        throw new Error("Invalid timezone or start date");
+      if (!sdate.isValid || !edate.isValid) {
+        throw new Error("Invalid timezone or date range");
       }
+
+      const totalDays = Math.floor(edate.diff(sdate, "days").days) + 1;
+
       return Array.from({ length: totalDays }, (_, i) => {
         const d = sdate.plus({ days: i });
-        if (!d.isValid) return null;
+
         return {
           day: d.day,
           month: d.month,
           year: d.year,
           fullDate: d.toISODate(),
         };
-      }).filter(Boolean) as DateItem[];
+      });
     } catch (error) {
       console.error("generateDates error:", error);
+
       return [];
     }
   };
 
   const dates = useMemo<DateItem[]>(() => {
-    return generateDates(startDate);
-  }, [startDate]);
+    return generateDates(startDate, endDate);
+  }, [startDate, endDate]);
 
   const selectedStaffServices = useMemo(() => {
     if (!selectedProfessional?.id) return [];
@@ -130,7 +141,7 @@ export default function TimePage(): JSX.Element {
 
   const handleShift = (dir: number): void => {
     setStripStart((prev) =>
-      Math.max(0, Math.min(dates.length - 11, prev + dir * 4)),
+      Math.max(0, Math.min(dates.length - visibleCount, prev + dir * 4)),
     );
   };
 
@@ -144,7 +155,7 @@ export default function TimePage(): JSX.Element {
         }),
       );
     }
-  }, []);
+  }, [selectedDate, startDate, dispatch]);
 
   useEffect(() => {
     if (!selectedDate || !dates.length) return;
@@ -166,21 +177,38 @@ export default function TimePage(): JSX.Element {
   }, [selectedDate, dates, visibleCount]);
 
   const handlePickDate = (d: DateItem): void => {
-    const isDisabled = isDateDisabled({
-      dateObj: d,
-      selectedProfessional,
-      outletTimeZone: timeZone || "UTC",
+    const dt = DateTime.fromISO(d.fullDate || "", {
+      zone: timeZone || "UTC",
     });
+
+    const normalizedDate = dt.startOf("day");
+
+    const isPastDate = normalizedDate < startDate;
+
+    const isAfterLimit = normalizedDate > endDate;
+
+    const isDisabled =
+      isPastDate ||
+      isAfterLimit ||
+      isDateDisabled({
+        dateObj: d,
+        selectedProfessional,
+        outletTimeZone: timeZone || "UTC",
+      });
+
     if (isDisabled) {
       toast.warning("Staff is unavailable on this date");
       return;
     }
-    const selected = {
-      day: d.day,
-      month: d.month,
-      year: d.year,
-    };
-    dispatch(setSelectedDate(selected));
+
+    dispatch(
+      setSelectedDate({
+        day: d.day,
+        month: d.month,
+        year: d.year,
+      }),
+    );
+
     dispatch(setSelectedTime(null));
   };
 
@@ -272,37 +300,6 @@ export default function TimePage(): JSX.Element {
     getDefaultOpenSection(),
   );
 
-  const setNextSlotDate = (): void => {
-    let nextAvailableDate: DateTime | null = null;
-    for (let i = 1; i < dates.length; i++) {
-      const nextDate = startDate.plus({ days: i });
-      const dateObj = {
-        day: nextDate.day,
-        month: nextDate.month,
-        year: nextDate.year,
-        fullDate: nextDate.toISODate(),
-      };
-      if (
-        !isDateDisabled({
-          dateObj,
-          selectedProfessional,
-          outletTimeZone: timeZone || "UTC",
-        })
-      ) {
-        nextAvailableDate = nextDate;
-        break;
-      }
-    }
-    if (!nextAvailableDate) return;
-    dispatch(
-      setSelectedDate({
-        day: nextAvailableDate.day,
-        month: nextAvailableDate.month,
-        year: nextAvailableDate.year,
-      }),
-    );
-  };
-
   useEffect(() => {
     const firstSelectedIndex = selectedSlotIndexes[0];
     const selectedSlot = allSlots[firstSelectedIndex];
@@ -315,20 +312,6 @@ export default function TimePage(): JSX.Element {
       setOpenSection("evening");
     }
   }, [selectedSlotIndexes, allSlots, amSlots, pmSlots, evSlots]);
-
-  useEffect(() => {
-    const hasAvailable = (slotsArr: Slot[]): boolean =>
-      slotsArr.some(
-        (s) => !s.isBooked && s.status === "AVAILABLE" && !s.disabled,
-      );
-    const noSlotsAvailable =
-      !hasAvailable(amSlots) &&
-      !hasAvailable(pmSlots) &&
-      !hasAvailable(evSlots);
-    if (!loading && noSlotsAvailable) {
-      setNextSlotDate();
-    }
-  }, [amSlots, pmSlots, evSlots]);
 
   return (
     <MainLayout
@@ -361,7 +344,16 @@ export default function TimePage(): JSX.Element {
             <ChevronLeft size={20} />
           </DateNavBtn>
           {dates.slice(stripStart, stripStart + visibleCount).map((d) => {
-            const dt = DateTime.fromISO(d.fullDate || "");
+            const dt = DateTime.fromObject(
+              {
+                year: d.year,
+                month: d.month,
+                day: d.day,
+              },
+              {
+                zone: timeZone || "UTC",
+              },
+            );
             const dow = dt.weekday % 7;
             const today = DateTime.now().setZone(timeZone).startOf("day");
             const isToday = dt.hasSame(today, "day");
@@ -369,11 +361,20 @@ export default function TimePage(): JSX.Element {
               selectedDate?.day === d.day &&
               selectedDate?.month === d.month &&
               selectedDate?.year === d.year;
-            const isDisabled = isDateDisabled({
-              dateObj: d,
-              selectedProfessional,
-              outletTimeZone: timeZone || "UTC",
-            });
+            const normalizedDate = dt.startOf("day");
+
+            const isPastDate = normalizedDate < startDate;
+
+            const isAfterLimit = normalizedDate > endDate;
+
+            const isDisabled =
+              isPastDate ||
+              isAfterLimit ||
+              isDateDisabled({
+                dateObj: d,
+                selectedProfessional,
+                outletTimeZone: timeZone || "UTC",
+              });
             return (
               <div
                 key={`${d.day}-${d.month}-${d.year}`}
@@ -384,11 +385,13 @@ export default function TimePage(): JSX.Element {
                 }}
                 className={[
                   "arravpos-date-card",
-                  isDisabled
+                  isPastDate || isAfterLimit
                     ? "arravpos-date-card-disabled"
-                    : isSelected
-                      ? "arravpos-date-card-active"
-                      : "arravpos-date-card-default",
+                    : isDisabled
+                      ? "arravpos-date-card-disabled"
+                      : isSelected
+                        ? "arravpos-date-card-active"
+                        : "arravpos-date-card-default",
                 ]
                   .filter(Boolean)
                   .join(" ")}
@@ -396,9 +399,7 @@ export default function TimePage(): JSX.Element {
                 {isDisabled && <div className="arravpos-date-disabled-slash" />}
                 <span className="arravpos-date-week">{WEEK_DAYS[dow]}</span>
                 <span className="arravpos-date-day">{d.day}</span>
-                {isToday && !isSelected && !isDisabled && (
-                  <span className="arravpos-date-today">TODAY</span>
-                )}
+                {isToday && <span className="arravpos-date-today">TODAY</span>}
                 {isDisabled && (
                   <span className="arravpos-date-unavailable">UNAVAILABLE</span>
                 )}
@@ -575,8 +576,10 @@ function SlotSection({
                         : "arravpos-slot-card-default"
                   }`}
                 >
-                  <span className="arravpos-slot-time">{slot.start_time}</span>
-                  
+                  <span className="arravpos-slot-time">
+                    {slot.start_time_12h}
+                  </span>
+
                   <span className="arravpos-slot-status">
                     {slot.disabled
                       ? ""
