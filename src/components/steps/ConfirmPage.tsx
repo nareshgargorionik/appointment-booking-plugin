@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, useRef, JSX, useCallback } from "react";
 import { toast } from "react-toastify";
 import { DateTime } from "luxon";
 import { useSelector, useDispatch } from "react-redux";
-import { Check, CalendarDays, Store, CreditCard } from "lucide-react";
+import { Check, CalendarDays, Store } from "lucide-react";
 import { createAppointment } from "@/slices/appointmentSlice";
 import { payCustomerDirect, finalizeInvoice } from "@/services";
 import PaymentModal from "@/components/modals/PaymentModal";
