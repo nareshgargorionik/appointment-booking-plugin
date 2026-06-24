@@ -1,15 +1,10 @@
 import { useState, useEffect, useMemo, useRef, JSX, useCallback } from "react";
-import { useForm, Controller, SubmitHandler } from "react-hook-form";
 import { toast } from "react-toastify";
 import { DateTime } from "luxon";
 import { useSelector, useDispatch } from "react-redux";
-import { Check, CalendarDays, CreditCard, Store } from "lucide-react";
-import { debounce } from "lodash";
-import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
-import type { CountryCode } from "libphonenumber-js";
+import { Check, CalendarDays, Store, CreditCard } from "lucide-react";
 import { createAppointment } from "@/slices/appointmentSlice";
 import { payCustomerDirect, finalizeInvoice } from "@/services";
-import OrderSidebar from "@/components/sidebar/OrderSidebar";
 import PaymentModal from "@/components/modals/PaymentModal";
 import ConsentModal from "@/components/modals/ConsentModal";
 import {
@@ -28,6 +23,7 @@ import { calculateServiceTax } from "@/utils";
 import type { RootState, AppDispatch } from "@/store";
 import {
   PaymentMeta,
+  PayType,
   Service,
   OutletRootState,
   EnforcementType,
@@ -44,26 +40,23 @@ import {
   SignatureType,
   AppointmentPayload,
   SubmitFinalConsentPayload,
-  FormValues,
-  FetchCustomerResponse,
 } from "@/types";
-import {
-  setUserDetails,
-  clearUserDetails,
-  setPayType,
-} from "@/slices/appointmentSlice";
-import { fetchCustomer } from "@/services";
 import { setSidebarOpen } from "@/slices/themeSlice";
+import { useForm, Controller, SubmitHandler } from "react-hook-form";
+import { debounce } from "lodash";
+import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
+import type { CountryCode } from "libphonenumber-js";
 
-const allowedCountries: CountryCode[] = [
-  "IN",
-  "US",
-  "CA",
-  "PH",
-  "NZ",
-  "AU",
-  "CN",
-] as const;
+import { setUserDetails, clearUserDetails } from "@/slices/appointmentSlice";
+
+import { fetchCustomer } from "@/services";
+
+import { FormValues, FetchCustomerResponse } from "@/types";
+import OrderSidebar from "../sidebar/OrderSidebar";
+
+// ─── Domain Types ───────────────────────────────────────────────────────────
+// ─── Constants ───────────────────────────────────────────────────────────────
+
 const MONTH_NAMES: string[] = [
   "Jan",
   "Feb",
@@ -78,46 +71,59 @@ const MONTH_NAMES: string[] = [
   "Nov",
   "Dec",
 ];
+
 const CONSENT_DRAFT_KEY = "consentDraftByService";
 const SLOT_INTERVAL = 15;
+
+const allowedCountries: CountryCode[] = [
+  "IN",
+  "US",
+  "CA",
+  "PH",
+  "NZ",
+  "AU",
+  "CN",
+] as const;
+// ─── Helpers ─────────────────────────────────────────────────────────────────
 
 const expiryToNumber = (exp: string): number => {
   const [mm, yy] = exp.split("/");
   return Number(`${mm}${yy}`);
 };
 
+// ─── Component ───────────────────────────────────────────────────────────────
+
 export default function ConfirmPage(): JSX.Element {
   const dispatch = useDispatch<AppDispatch>();
-  const {
-    tenantId,
-    id: outletId,
-    timeZone,
-    image,
-    outletName,
-    address,
-  } = useSelector((state: OutletRootState) => state.booking.outletDetails);
+  const { tenantId, id: outletId } = useSelector(
+    (state: OutletRootState) => state.booking.outletDetails,
+  );
+
+  const { timeZone, image, outletName, address } = useSelector(
+    (state: RootState) => state.booking.outletDetails,
+  );
   const { staff, selectedServices, selectedProfessional } = useSelector(
     (state: RootState) => state.booking.service,
   );
-  const {
-    selectedSlotIds,
-    selectedDate,
-    selectedTime,
-    selectedSlotIndexes,
-    slots,
-  } = useSelector((state: RootState) => state.booking.slots);
-  const { userDetails, bookingMode, tipPct, payType } = useSelector(
+  const { selectedSlotIds, selectedDate, selectedTime } = useSelector(
+    (state: RootState) => state.booking.slots,
+  );
+  const { userDetails, bookingMode, tipPct } = useSelector(
     (state: RootState) => state.booking.appointment,
   );
-  const consentFlowLockRef = useRef<boolean>(false);
-  const lastOpenedConsentServiceRef = useRef<string>("");
-  const todayDate = DateTime.now().setZone(timeZone ?? "UTC");
+
   const services: any[] = Array.isArray(selectedServices)
     ? selectedServices
     : [selectedServices];
+
+  const { selectedSlotIndexes, slots } = useSelector(
+    (state: RootState) => state.booking.slots,
+  );
+
   const [loading, setLoading] = useState<boolean>(false);
   const [showPaymentModal, setShowPaymentModal] = useState<boolean>(false);
   const [paymentMeta, setPaymentMeta] = useState<PaymentMeta | null>(null);
+  const [payType, setPayType] = useState<PayType | "">("person");
   const [consentOpen, setConsentOpen] = useState<boolean>(false);
   const [consentHeading, setConsentHeading] = useState<string>("");
   const [consentText, setConsentText] = useState<string>("");
@@ -133,11 +139,18 @@ export default function ConfirmPage(): JSX.Element {
     Record<string, ConsentCheckStatus>
   >({});
   const [checkingConsent, setCheckingConsent] = useState<boolean>(false);
-  const [formLoading, setFormLoading] = useState<boolean>(false);
+
+  const consentFlowLockRef = useRef<boolean>(false);
+  const lastOpenedConsentServiceRef = useRef<string>("");
+
+  const todayDate = DateTime.now().setZone(timeZone ?? "UTC");
+
   const [loadingField, setLoadingField] = useState<"phone" | "email" | null>(
     null,
   );
+
   const [isAutoFilled, setIsAutoFilled] = useState<boolean>(false);
+
   const lastQueryRef = useRef<string>("");
 
   const debouncedFetchRef = useRef<
@@ -147,11 +160,42 @@ export default function ConfirmPage(): JSX.Element {
     | null
   >(null);
 
+  const {
+    register,
+    handleSubmit,
+    control,
+    watch,
+    reset,
+    trigger,
+    setValue,
+    formState: { errors, isSubmitted, isSubmitting },
+  } = useForm<FormValues>({
+    defaultValues: {
+      firstName: userDetails?.firstName || "",
+      lastName: userDetails?.lastName || "",
+      phone: userDetails?.phone || "",
+      email: userDetails?.email || "",
+    },
+    mode: "onChange",
+    reValidateMode: "onChange",
+  });
+
+  const phoneValue = watch("phone");
+  const emailValue = watch("email");
+
+  const normalizePhone = (phone?: string): string =>
+    phone?.replace(/\s+/g, "") || "";
+
+  const isValidEmail = (email: string): boolean => /^\S+@\S+\.\S+$/.test(email);
+
+  // ─── Enriched services ──────────────────────────────────────────────────────
+
   const selectedStaffServices: EnrichedService[] = services.map((svc) => {
-    const staffMember = staff?.find(
-      (s: any) => s.id === selectedProfessional?.id,
+    const staffMember = staff?.find((s) => s.id === selectedProfessional?.id);
+    const assignment = staffMember?.assignments?.find(
+      (a: any) => a.id === svc.id,
     );
-    const assignment = staffMember?.assignments?.find((a) => a.id === svc.id);
+
     const updatedSvc: Service = {
       ...svc,
       price: assignment?.price ?? svc.price ?? svc.min_price ?? 0,
@@ -165,6 +209,8 @@ export default function ConfirmPage(): JSX.Element {
     };
   });
 
+  // ─── Slot / time helpers ────────────────────────────────────────────────────
+
   const allSlots: Slot[] = [
     ...(slots?.morning ?? []),
     ...(slots?.afternoon ?? []),
@@ -175,7 +221,9 @@ export default function ConfirmPage(): JSX.Element {
     (sum, s) => sum + Number(s.duration ?? 0),
     0,
   );
+
   const requiredSlots: number = Math.ceil(totalDuration / SLOT_INTERVAL);
+
   const formatTimeRange = (startIndex: number): string => {
     if (!allSlots.length) return "";
     const start = allSlots[startIndex]?.start_time_12h;
@@ -192,18 +240,25 @@ export default function ConfirmPage(): JSX.Element {
   };
 
   const selectedStartIndex: number | undefined = selectedSlotIndexes?.[0];
+
+  console.log("------selectedStartIndex---", selectedStartIndex);
+
   const timeRange: string | null =
     selectedStartIndex !== undefined
       ? formatTimeRange(selectedStartIndex)
       : null;
+
   const dateStr: string | null = timeRange
     ? `${MONTH_NAMES[safeDate.month - 1]} ${safeDate.day} at ${timeRange}`
     : null;
 
+  // ─── Price calculations ─────────────────────────────────────────────────────
+
   const totalBasePrice: number = selectedStaffServices.reduce(
-    (sum, s) => sum + Number(s.price || s.min_price) * (s.qty ?? 1),
+    (sum, s) => sum + Number(s.price) * (s.qty ?? 1),
     0,
   );
+
   const taxAmt: number = selectedStaffServices.reduce(
     (sum, s) => sum + s.tax,
     0,
@@ -212,6 +267,8 @@ export default function ConfirmPage(): JSX.Element {
   const tipAmt: number = (totalBasePrice * tipPct) / 100;
   const tipCents: number = Math.round(tipAmt * 100);
   const totalWithTax: number = totalBasePrice + tipAmt + taxAmt;
+
+  // ─── Consent logic ──────────────────────────────────────────────────────────
 
   const servicesNeedingConsent: Service[] = useMemo(() => {
     return services.filter((s) => {
@@ -240,30 +297,155 @@ export default function ConfirmPage(): JSX.Element {
     setConsentAcceptedMap((prev) => ({ ...prev, [String(serviceId)]: true }));
   };
 
-  const {
-    register,
-    handleSubmit,
-    control,
-    watch,
-    reset,
-    trigger,
-    setValue,
-    formState: { errors, isSubmitted, isSubmitting },
-  } = useForm<FormValues>({
-    defaultValues: {
-      firstName: "",
-      lastName: "",
-      phone: "",
-      email: "",
-    },
-    mode: "onSubmit",
-  });
-
   useEffect(() => {
     if (userDetails && servicesNeedingConsent?.length > 0) {
       runConsentChecks();
     }
   }, [userDetails, servicesNeedingConsent?.length]);
+
+  useEffect(() => {
+    reset(
+      { ...userDetails, phone: userDetails?.phone || "" },
+      { keepErrors: true, keepDirty: false },
+    );
+  }, [userDetails, reset]);
+
+  useEffect(() => {
+    if (isSubmitted) {
+      trigger(["phone", "email"]);
+    }
+  }, [phoneValue, emailValue, isSubmitted, trigger]);
+  // -------------------- Fetch Customer --------------------
+  const fetchCustomerData = useCallback(
+    async ({
+      value,
+      type,
+    }: {
+      value: string;
+      type: "phone" | "email";
+    }): Promise<void> => {
+      if (!value) return;
+
+      let searchKey = "";
+
+      if (type === "phone") {
+        if (!isValidPhoneNumber(value)) return;
+        searchKey = normalizePhone(value);
+      }
+
+      if (type === "email") {
+        if (!isValidEmail(value)) return;
+        searchKey = value.trim();
+      }
+
+      if (!searchKey) return;
+
+      if (lastQueryRef.current === searchKey && isAutoFilled) {
+        return;
+      }
+
+      lastQueryRef.current = searchKey;
+
+      setLoading(true);
+      setLoadingField(type);
+
+      try {
+        const res: FetchCustomerResponse = await fetchCustomer({
+          search: searchKey,
+          tenantId,
+        });
+
+        const customer = res?.data?.[0];
+
+        if (customer) {
+          setValue("firstName", customer.first_name || "", {
+            shouldValidate: true,
+          });
+
+          setValue("lastName", customer.last_name || "");
+
+          if (customer.phone && isValidPhoneNumber(customer.phone)) {
+            setValue("phone", customer.phone);
+          }
+
+          if (customer.email) {
+            setValue("email", customer.email);
+          }
+
+          dispatch(
+            setUserDetails({
+              email: customer.email,
+              firstName: customer.first_name,
+              lastName: customer.last_name,
+              phone: customer.phone,
+            }),
+          );
+
+          setIsAutoFilled(true);
+        } else {
+          setIsAutoFilled(false);
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+        setLoadingField(null);
+      }
+    },
+    [dispatch, setValue, tenantId, isAutoFilled],
+  );
+  // -------------------- Debounce --------------------
+  useEffect(() => {
+    debouncedFetchRef.current = debounce(fetchCustomerData, 800);
+
+    return () => {
+      debouncedFetchRef.current?.cancel?.();
+    };
+  }, [fetchCustomerData]);
+  // -------------------- Input Change --------------------
+  const handleInputChange = (
+    value: string,
+    onChange: ((value: string) => void) | null,
+    type: "phone" | "email",
+  ): void => {
+    if (onChange) {
+      onChange(value);
+    }
+
+    if (!value) {
+      debouncedFetchRef.current?.cancel?.();
+
+      lastQueryRef.current = "";
+
+      setIsAutoFilled(false);
+
+      setLoadingField(null);
+
+      return;
+    }
+
+    setLoadingField(type);
+
+    debouncedFetchRef.current?.({
+      value,
+      type,
+    });
+  };
+  // -------------------- Clear Customer --------------------
+  const handleClearCustomer = (): void => {
+    reset({
+      firstName: "",
+      lastName: "",
+      email: "",
+      phone: "",
+    });
+
+    setIsAutoFilled(false);
+
+    lastQueryRef.current = "";
+
+    dispatch(clearUserDetails());
+  };
 
   const runConsentChecks = async (): Promise<void> => {
     const cid = userDetails?.id;
@@ -317,6 +499,16 @@ export default function ConfirmPage(): JSX.Element {
     if (consentFlowLockRef.current) return;
     consentFlowLockRef.current = true;
     try {
+      if (!userDetails?.firstName) {
+        toast.warn("Please enter First Name before signing consent.");
+        return;
+      }
+      if (!userDetails?.email && !userDetails?.phone) {
+        toast.warn(
+          "Please enter Email or Mobile Number before signing consent.",
+        );
+        return;
+      }
       const svc = pendingConsentServices[0];
       if (!svc) {
         await proceedWithBooking();
@@ -415,6 +607,7 @@ export default function ConfirmPage(): JSX.Element {
     if (enforcement === "TYPED_NAME") signatureType = "TYPED_NAME";
     else if (enforcement === "DRAW_SIGNATURE")
       signatureType = "SIGNATURE_IMAGE";
+
     saveConsentDraft(sid, {
       serviceId: sid,
       concentFormId: formId,
@@ -448,6 +641,7 @@ export default function ConfirmPage(): JSX.Element {
         captured: cap,
       }))
       .filter((x) => x.serviceId && x.concentFormId);
+
     for (const item of entries) {
       const { serviceId, concentFormId, captured } = item;
       const signatureType: SignatureType =
@@ -457,6 +651,7 @@ export default function ConfirmPage(): JSX.Element {
           : captured.signatureDataUrl
             ? "SIGNATURE_IMAGE"
             : "CHECKBOX_ONLY");
+
       const submitPayload: SubmitFinalConsentPayload = {
         tenantId,
         outletId,
@@ -477,43 +672,71 @@ export default function ConfirmPage(): JSX.Element {
     localStorage.removeItem(CONSENT_DRAFT_KEY);
   };
 
+  // ─── Booking payloads ───────────────────────────────────────────────────────
+
   let formattedDate = "";
   if (selectedDate) {
     formattedDate = `${selectedDate?.year}-${String(selectedDate?.month).padStart(2, "0")}-${String(selectedDate?.day).padStart(2, "0")}`;
   }
-  const payload: AppointmentPayload = {
-    tenantId,
-    outletId,
-    staffId: selectedProfessional?.id,
-    date: formattedDate,
-    startTime: selectedTime,
-    serviceIds: services.map((s) => s.id),
-    slotIds: selectedSlotIds,
-    isWalkIn: false,
-    requiresConsent: servicesNeedingConsent.length > 0,
-    customer: {
-      first_name: userDetails?.firstName,
-      last_name: userDetails?.lastName,
-      email: userDetails?.email,
-      phone: userDetails?.phone,
-    },
-  };
 
-  const proceedWithBooking = async (): Promise<void> => {
+  // const checkinPayload: CheckinPayload = {
+  //     tenantId,
+  //     outletId,
+  //     date: outletTimeZoneDate,
+  //     staffId: selectedProfessional?.id,
+  //     serviceIds: services.map((s) => s.id),
+  //     slotIds: selectedSlotIds,
+  //     startTime: selectedTime,
+  //     customer: {
+  //         first_name: userDetails?.firstName,
+  //         last_name: userDetails?.lastName,
+  //         email: userDetails?.email,
+  //         phone: userDetails?.phone,
+  //     },
+  // };
+
+  // ─── Booking actions ────────────────────────────────────────────────────────
+
+  const proceedWithBooking = async (formData?: FormValues): Promise<void> => {
+    const userData = formData || userDetails;
+    const payload: AppointmentPayload = {
+      tenantId,
+      outletId,
+      staffId: selectedProfessional?.id,
+      date: formattedDate,
+      startTime: selectedTime,
+      serviceIds: services.map((s) => s.id),
+      slotIds: selectedSlotIds,
+      isWalkIn: false,
+      requiresConsent: servicesNeedingConsent.length > 0,
+      customer: {
+        first_name: userData?.firstName,
+        last_name: userData?.lastName,
+        email: userData?.email,
+        phone: userData?.phone,
+      },
+    };
     if (servicesNeedingConsent.length && !allConsentsDone) {
       toast.warn("Please complete all consent forms first");
       return;
     }
     try {
       setLoading(true);
+
       const result = await dispatch(createAppointment(payload)).unwrap();
+
       const data: any = result?.data ?? result;
+
       const appointmentId = data.id || "";
+
       const customerId = data.customerId || data.customer?.id || "";
+
       const staffId = data.staffId || selectedProfessional?.id || "";
+
       if (bookingMode === "booking" && doneConsentCount > 0) {
         await submitAllConsents(appointmentId, customerId, staffId);
       }
+
       if (payType === "card") {
         setPaymentMeta({ appointmentId, customerId });
         setShowPaymentModal(true);
@@ -528,39 +751,79 @@ export default function ConfirmPage(): JSX.Element {
         err?.message ||
         "Staff not working on this day" ||
         "Something went wrong";
+
       toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
   };
 
+  // const syncFormToRedux = (data: FormValues): void => {
+  //   dispatch(
+  //     setUserDetails({
+  //       firstName: data.firstName,
+  //       lastName: data.lastName,
+  //       email: data.email,
+  //       phone: data.phone,
+  //     }),
+  //   );
+  // };
+
+  // const handleBooking = async (data?: FormValues): Promise<void> => {
+  //   if (data) {
+  //     syncFormToRedux(data);
+  //   }
+
+  //   const latestUser = data || {
+  //     firstName: watch("firstName"),
+  //     lastName: watch("lastName"),
+  //     email: watch("email"),
+  //     phone: watch("phone"),
+  //   };
+
+  //   if (!selectedTime && bookingMode === "booking") {
+  //     return void toast.error("Select time");
+  //   }
+
+  //   if (!latestUser?.firstName) {
+  //     return void toast.error("Enter first name");
+  //   }
+
+  //   if (!latestUser?.email && !latestUser?.phone) {
+  //     return void toast.error("Email or phone required");
+  //   }
+
+  //   if (servicesNeedingConsent.length > 0) {
+  //     if (allConsentsDone) {
+  //       await proceedWithBooking(latestUser);
+  //     } else {
+  //       await startConsentSigning();
+  //     }
+  //   } else {
+  //     await proceedWithBooking(latestUser);
+  //   }
+  // };
   const onSubmit: SubmitHandler<FormValues> = async (data): Promise<void> => {
     const payload = {
       ...data,
       phone: data?.phone ?? "",
     };
-    dispatch(setUserDetails(payload));
     if (!payType) {
       return void toast.error("Select payment method");
     }
     if (!selectedTime && bookingMode === "booking") {
       return void toast.error("Select time");
     }
-    if (!payload?.firstName) {
-      return void toast.error("Enter first name");
-    }
-    if (!payload?.email && !payload?.phone) {
-      return void toast.error("Email or phone required");
-    }
+    dispatch(setUserDetails(payload));
 
     if (servicesNeedingConsent.length > 0) {
       if (allConsentsDone) {
-        await proceedWithBooking();
+        await proceedWithBooking(payload);
       } else {
         await startConsentSigning();
       }
     } else {
-      await proceedWithBooking();
+      await proceedWithBooking(payload);
     }
   };
 
@@ -571,11 +834,17 @@ export default function ConfirmPage(): JSX.Element {
       ...data,
       phone: data?.phone ?? "",
     };
-    dispatch(setUserDetails(payload));
     if (!payType) {
       return void toast.error("Select payment method");
     }
+    if (!selectedTime && bookingMode === "booking") {
+      return void toast.error("Select time");
+    }
+    dispatch(setUserDetails(payload));
+    dispatch(setSidebarOpen(true));
   };
+
+  // ─── Payment helpers ────────────────────────────────────────────────────────
 
   const getCardType = (number: string): CardType => {
     const num = number.replace(/\s/g, "");
@@ -627,12 +896,14 @@ export default function ConfirmPage(): JSX.Element {
           },
         },
       };
+
       const resp = await payCustomerDirect(paymentPayload);
       const data = resp?.data?.data ?? resp?.data ?? resp ?? {};
       const orderId = data?.orderId;
       const isSuccess =
         String(data?.mappedStatus).toLowerCase() === "succeeded" ||
         String(data?.reasonMessage).toLowerCase() === "success";
+
       if (isSuccess) {
         toast.success("Payment successful!");
         if (orderId) {
@@ -670,133 +941,13 @@ export default function ConfirmPage(): JSX.Element {
 
   const handlePaymentCancel = (): void => {
     setShowPaymentModal(false);
+
     toast.warning("Appointment booked. Payment was cancelled.");
+
     dispatch(setAppointmentId(String(paymentMeta?.appointmentId)));
+
     dispatch(nextStep());
   };
-
-  const fetchCustomerData = useCallback(
-    async ({
-      value,
-      type,
-    }: {
-      value: string;
-      type: "phone" | "email";
-    }): Promise<void> => {
-      if (!value) return;
-      let searchKey = "";
-      if (type === "phone") {
-        if (!isValidPhoneNumber(value)) return;
-        searchKey = normalizePhone(value);
-      }
-      if (type === "email") {
-        if (!isValidEmail(value)) return;
-        searchKey = value.trim();
-      }
-      if (!searchKey) return;
-      if (lastQueryRef.current === searchKey && isAutoFilled) {
-        return;
-      }
-      lastQueryRef.current = searchKey;
-      setFormLoading(true);
-      setLoadingField(type);
-      try {
-        const res: FetchCustomerResponse = await fetchCustomer({
-          search: searchKey,
-          tenantId,
-        });
-        const customer = res?.data?.[0];
-        if (customer) {
-          setValue("firstName", customer.first_name || "", {
-            shouldValidate: true,
-          });
-          setValue("lastName", customer.last_name || "");
-          if (customer.phone && isValidPhoneNumber(customer.phone)) {
-            setValue("phone", customer.phone);
-          }
-          if (customer.email) {
-            setValue("email", customer.email);
-          }
-          dispatch(
-            setUserDetails({
-              email: customer.email,
-              firstName: customer.first_name,
-              lastName: customer.last_name,
-              phone: customer.phone,
-            }),
-          );
-          setIsAutoFilled(true);
-        } else {
-          setIsAutoFilled(false);
-        }
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setFormLoading(false);
-        setLoadingField(null);
-      }
-    },
-    [dispatch, setValue, isAutoFilled],
-  );
-
-  const handleClearCustomer = (): void => {
-    reset({
-      firstName: "",
-      lastName: "",
-      email: "",
-      phone: "",
-    });
-    setIsAutoFilled(false);
-    lastQueryRef.current = "";
-    dispatch(clearUserDetails());
-  };
-
-  useEffect(() => {
-    debouncedFetchRef.current = debounce(fetchCustomerData, 800);
-    return () => {
-      debouncedFetchRef.current?.cancel?.();
-    };
-  }, [fetchCustomerData]);
-
-  const handleInputChange = (
-    value: string,
-    onChange: ((value: string) => void) | null,
-    type: "phone" | "email",
-  ): void => {
-    if (onChange) {
-      onChange(value);
-    }
-    if (!value) {
-      debouncedFetchRef.current?.cancel?.();
-      lastQueryRef.current = "";
-      setIsAutoFilled(false);
-      setLoadingField(null);
-      return;
-    }
-    setLoadingField(type);
-    debouncedFetchRef.current?.({ value, type });
-  };
-
-  const phoneValue = watch("phone");
-  const emailValue = watch("email");
-
-  useEffect(() => {
-    reset(
-      { ...userDetails, phone: userDetails?.phone || "" },
-      { keepErrors: true, keepDirty: false },
-    );
-  }, [userDetails, reset]);
-
-  useEffect(() => {
-    if (isSubmitted) {
-      trigger(["phone", "email"]);
-    }
-  }, [phoneValue, emailValue, isSubmitted, trigger]);
-
-  const normalizePhone = (phone?: string): string =>
-    phone?.replace(/\s+/g, "") || "";
-
-  const isValidEmail = (email: string): boolean => /^\S+@\S+\.\S+$/.test(email);
 
   return (
     <MainLayout
@@ -880,13 +1031,13 @@ export default function ConfirmPage(): JSX.Element {
                     icon={<Store size={18} />}
                     label="Pay in person"
                     selected={payType === "person"}
-                    onClick={() => dispatch(setPayType("person"))}
+                    onClick={() => setPayType("person")}
                   />
                   <PayOption
                     icon={<CreditCard size={18} />}
                     label="Pay with card"
                     selected={payType === "card"}
-                    onClick={() => dispatch(setPayType("card"))}
+                    onClick={() => setPayType("card")}
                   />
                 </div>
               </div>
@@ -936,9 +1087,9 @@ export default function ConfirmPage(): JSX.Element {
                               className="aaravpos-custom-input"
                             />
 
-                            {formLoading && loadingField === "phone" && (
-                              <div className="aaravpos-loader-wrapper">
-                                <div className="aaravpos-loader" />
+                            {loading && loadingField === "phone" && (
+                              <div className="arravpos-loader-wrapper">
+                                <div className="arravpos-loader" />
                               </div>
                             )}
                           </div>

@@ -442,6 +442,7 @@ export interface AppointmentDetails {
   outlet: Outlet;
   customer: Customer;
   appointmentDate: string;
+  start_time_12h: string;
   startTime: string;
   endTime: string;
   startLocal: string;

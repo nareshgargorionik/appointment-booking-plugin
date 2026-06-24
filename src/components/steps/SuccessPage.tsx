@@ -185,7 +185,7 @@ export default function SuccessPage(): JSX.Element {
 
                             <span className="aaravpos-value">
                                 {appointment.appointmentDate} at{" "}
-                                {appointment.startTime}
+                                {appointment.start_time_12h}
                             </span>
                         </div>
                         <div className="aaravpos-success-row">
