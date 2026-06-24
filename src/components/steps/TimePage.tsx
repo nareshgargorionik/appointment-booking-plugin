@@ -464,7 +464,6 @@ export default function TimePage(): JSX.Element {
                 }}
                 className={[
                   "aaravpos-date-card",
-
                   isPastDate || isAfterLimit
                     ? "aaravpos-date-card-disabled"
                     : isDisabled
