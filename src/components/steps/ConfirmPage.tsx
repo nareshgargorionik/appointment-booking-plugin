@@ -241,8 +241,6 @@ export default function ConfirmPage(): JSX.Element {
 
   const selectedStartIndex: number | undefined = selectedSlotIndexes?.[0];
 
-  console.log("------selectedStartIndex---", selectedStartIndex);
-
   const timeRange: string | null =
     selectedStartIndex !== undefined
       ? formatTimeRange(selectedStartIndex)
