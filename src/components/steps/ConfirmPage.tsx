@@ -155,8 +155,8 @@ export default function ConfirmPage(): JSX.Element {
 
   const debouncedFetchRef = useRef<
     | (((params: { value: string; type: "phone" | "email" }) => void) & {
-        cancel?: () => void;
-      })
+      cancel?: () => void;
+    })
     | null
   >(null);
 
@@ -964,7 +964,7 @@ export default function ConfirmPage(): JSX.Element {
             totalConsents={totalConsentCount}
             checkingConsent={checkingConsent}
             loading={loading}
-            // isBookingDisabled={isBookingDisabled()}
+          // isBookingDisabled={isBookingDisabled()}
           />
         </div>
       }
@@ -1040,7 +1040,7 @@ export default function ConfirmPage(): JSX.Element {
                 </div>
               </div>
               {payType && (
-                <form className="aaravpos-tp-10">
+                <form className="aaravpos-tp-10" onSubmit={handleSubmit(onFormSubmit)}>
                   <div className="aaravpos-details-grid">
                     <div className="aaravpos-form-group">
                       <label className="aaravpos-form-label" htmlFor="phone">
@@ -1189,10 +1189,7 @@ export default function ConfirmPage(): JSX.Element {
                   </div>
                   <div className="aaravpos-center-items">
                     <button
-                      onClick={() => {
-                        handleSubmit(onFormSubmit);
-                        dispatch(setSidebarOpen(true));
-                      }}
+                      type="submit"
                       disabled={isSubmitting}
                       className="aaravpos-form-btn"
                     >
