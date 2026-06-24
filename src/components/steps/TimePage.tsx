@@ -24,10 +24,11 @@ import MainLayout from "@/components/common/MainLayout";
 import Breadcrumb from "@/components/common/Breadcrumb";
 import CalendarOverlay from "@/components/common/CalendarOverlay";
 // import { useWindowSize } from "@/hooks/useWindowSize";
-import type { AppDispatch } from "@/store";
+import type { AppDispatch, RootState } from "@/store";
 import { isDateDisabled } from "@/utils/isDateDisabled";
 import OrderSidebar from "@/components/sidebar/OrderSidebar";
 import SlotSkeleton from "@/components/common/SlotSkeleton";
+import { toggleProfessional } from "@/slices/serviceSlice";
 
 const MONTH_NAMES = [
   "Jan",
@@ -56,6 +57,10 @@ export default function TimePage(): JSX.Element {
     (state: OutletRootState) => state.booking.service,
   );
 
+  const { isService } = useSelector(
+    (state: RootState) => state.booking.outletDetails,
+  );
+
   const { tenantId, timeZone } = useSelector(
     (state: OutletRootState) => state?.booking?.outletDetails,
   );
@@ -81,6 +86,39 @@ export default function TimePage(): JSX.Element {
     () => startDate.plus({ months: 3 }).minus({ days: 1 }),
     [startDate],
   );
+
+  const selectedServiceIds = selectedServices.map((s) => s.id);
+
+  const filteredStaff = useMemo(() => {
+    if (!selectedServiceIds.length) return [];
+
+    return staff.filter((member) =>
+      selectedServiceIds.every((serviceId) =>
+        member.assignments.some((a) => a.id === serviceId && a.assigned),
+      ),
+    );
+  }, [staff, selectedServiceIds]);
+
+  const availableProfessionals = useMemo(
+    () => filteredStaff.filter((pro) => pro.id !== selectedProfessional?.id),
+    [filteredStaff, selectedProfessional],
+  );
+
+  const handleProfessionalChange = (professional: any) => {
+    if (professional.id === selectedProfessional?.id) return;
+
+    dispatch(toggleProfessional(professional));
+
+    dispatch(setSelectedDate(null));
+    dispatch(setSelectedTime(null));
+
+    dispatch(
+      setSelectedSlots({
+        indexes: [],
+        ids: [],
+      }),
+    );
+  };
 
   const generateDates = (sdate: DateTime, edate: DateTime): DateItem[] => {
     try {
@@ -521,34 +559,44 @@ export default function TimePage(): JSX.Element {
         </button>
       </div>
 
-      <div className="aaravpos-selected-professional">
-        {selectedProfessional?.imageUrl ? (
-          <img
-            src={selectedProfessional.imageUrl}
-            alt={selectedProfessional.name}
-            className="aaravpos-selected-professional-image"
-          />
-        ) : (
-          <div
-            className="aaravpos-selected-professional-avatar"
-            style={{
-              background: selectedProfessional?.color || "#111",
-            }}
-          >
-            {getUserName(selectedProfessional?.name)}
+      <div className="aaravpos-professional-wrapper">
+        <div className="aaravpos-selected-professional">
+          {selectedProfessional?.imageUrl ? (
+            <img
+              src={selectedProfessional.imageUrl}
+              alt={selectedProfessional.name}
+              className="aaravpos-selected-professional-image"
+            />
+          ) : (
+            <div
+              className="aaravpos-selected-professional-avatar"
+              style={{
+                background: selectedProfessional?.color || "#111",
+              }}
+            >
+              {getUserName(selectedProfessional?.name)}
+            </div>
+          )}
+
+          <div className="aaravpos-selected-professional-content">
+            <p className="aaravpos-selected-professional-name">
+              {selectedProfessional?.name}
+            </p>
+
+            <p className="aaravpos-selected-professional-services">
+              {selectedStaffServices.map((s: any) => s.name).join(", ")} ·{" "}
+              {totalDuration} min
+            </p>
           </div>
-        )}
-
-        <div className="aaravpos-selected-professional-content">
-          <p className="aaravpos-selected-professional-name">
-            {selectedProfessional?.name}
-          </p>
-
-          <p className="aaravpos-selected-professional-services">
-            {selectedStaffServices.map((s: any) => s.name).join(", ")} ·{" "}
-            {totalDuration} min
-          </p>
         </div>
+
+        {isService && availableProfessionals.length > 0 && (
+          <ProfessionalDropdown
+            professionals={filteredStaff}
+            selectedProfessional={selectedProfessional}
+            onSelect={handleProfessionalChange}
+          />
+        )}
       </div>
 
       <div
@@ -721,6 +769,88 @@ function SlotSection({
               );
             })}
           </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+interface ProfessionalDropdownProps {
+  professionals: any[];
+  selectedProfessional: any;
+  onSelect: (professional: any) => void;
+}
+
+function ProfessionalDropdown({
+  professionals,
+  selectedProfessional,
+  onSelect,
+}: ProfessionalDropdownProps): JSX.Element {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div className="aaravpos-professional-dropdown">
+      <button
+        onClick={() => setOpen((p) => !p)}
+        className="aaravpos-professional-dropdown-btn"
+      >
+        <span className="aaravpos-professional-dropdown-text">
+          Choose Professional
+        </span>
+
+        <ChevronDown
+          size={18}
+          className={`aaravpos-professional-dropdown-icon ${
+            open ? "aaravpos-professional-dropdown-icon-open" : ""
+          }`}
+        />
+      </button>
+
+      {open && (
+        <div className="aaravpos-professional-dropdown-menu">
+          {professionals
+            .filter((pro) => pro.id !== selectedProfessional?.id)
+            .map((pro, index, filteredProfessionals) => (
+              <div
+                key={pro.id}
+                onClick={() => {
+                  onSelect(pro);
+                  setOpen(false);
+                }}
+                className={`aaravpos-professional-dropdown-item ${
+                  index !== filteredProfessionals.length - 1
+                    ? "aaravpos-professional-dropdown-item-border"
+                    : ""
+                }`}
+              >
+                {pro.imageUrl ? (
+                  <img
+                    src={pro.imageUrl}
+                    className="aaravpos-professional-dropdown-avatar"
+                    alt={pro.name}
+                  />
+                ) : (
+                  <div
+                    className="aaravpos-professional-dropdown-avatar-placeholder"
+                    style={{
+                      background: pro.color || "#111",
+                    }}
+                  >
+                    {getUserName(pro.name)}
+                  </div>
+                )}
+
+                <div>
+                  <p className="aaravpos-professional-dropdown-name">
+                    {pro.name}
+                  </p>
+
+                  <p className="aaravpos-professional-dropdown-type">
+                    {pro.staff_type}
+                  </p>
+                </div>
+              </div>
+            ))}
         </div>
       )}
     </div>
