@@ -155,8 +155,8 @@ export default function ConfirmPage(): JSX.Element {
 
   const debouncedFetchRef = useRef<
     | (((params: { value: string; type: "phone" | "email" }) => void) & {
-      cancel?: () => void;
-    })
+        cancel?: () => void;
+      })
     | null
   >(null);
 
@@ -966,7 +966,7 @@ export default function ConfirmPage(): JSX.Element {
             totalConsents={totalConsentCount}
             checkingConsent={checkingConsent}
             loading={loading}
-          // isBookingDisabled={isBookingDisabled()}
+            // isBookingDisabled={isBookingDisabled()}
           />
         </div>
       }
@@ -1033,12 +1033,12 @@ export default function ConfirmPage(): JSX.Element {
                     selected={payType === "person"}
                     onClick={() => setPayType("person")}
                   />
-                  <PayOption
+                  {/* <PayOption
                     icon={<CreditCard size={18} />}
                     label="Pay with card"
                     selected={payType === "card"}
                     onClick={() => setPayType("card")}
-                  />
+                  /> */}
                 </div>
               </div>
               {payType && (
@@ -1282,15 +1282,32 @@ function PayOption({
   onClick,
 }: PayOptionProps): JSX.Element {
   return (
-    <div
-      onClick={onClick}
-      className={`aaravpos-select-card ${selected ? "aaravpos-select-card-active" : "aaravpos-select-card-default"}`}
-    >
-      <div className="aaravpos-center-items">{icon}</div>
-      {label}{" "}
-      <span className="aaravpos-select-check">
-        {selected && <Check size={18} />}
-      </span>
+    <div className="aaravpos-paymentcard-wrapper" onClick={onClick}>
+      <div className="aaravpos-paymentcard-container">
+        <div
+          className={`${selected ? "aaravpos-paymentcard-card active" : "aaravpos-paymentcard-card"}`}
+        >
+          <div className="aaravpos-paymentcard-content">
+            <div className="aaravpos-paymentcard-icon">{icon}</div>
+            <div className="aaravpos-paymentcard-info">
+              <div className="aaravpos-paymentcard-header">
+                <div>
+                  <h3 className="aaravpos-paymentcard-title">{label}</h3>
+                  <p className="aaravpos-paymentcard-description">
+                    Payment will be collected at the outlet during your
+                    appointment.
+                  </p>
+                </div>
+                {selected && (
+                  <div className="aaravpos-paymentcard-check">
+                    <Check size={18} />
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
