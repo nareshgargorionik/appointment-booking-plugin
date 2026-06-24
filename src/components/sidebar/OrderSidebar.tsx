@@ -1,26 +1,27 @@
-import {
-  useMemo,
-  useRef,
-  useState,
-  useEffect,
-  ReactNode,
-  JSX,
-} from "react";
+import { useMemo, useRef, useState, useEffect, ReactNode, JSX } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { DateTime } from "luxon";
 import { X, MoveRight, Clock3, Package2 } from "lucide-react";
 import { CurrencyIcon, getUserName } from "@/utils";
 import { calculateServiceTax } from "@/utils/taxHelper";
-import type {
-  OutletRootState,
-  ServiceItem,
-  StaffMember,
-  Slot,
-} from "@/types";
+import type { OutletRootState, ServiceItem, StaffMember, Slot } from "@/types";
 import { setSidebarOpen } from "@/slices/themeSlice";
 import type { AppDispatch } from "@/store";
 
-const MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const MONTH_NAMES = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
 
 interface ExtendedServiceItem extends ServiceItem {
   tax: number;
@@ -91,21 +92,12 @@ export default function OrderSidebar({
     );
     if (!staffMember) return [];
     return selectedServices.map((svc: any) => {
-      const assignment = staffMember.assignments?.find(
-        (a) => a.id === svc.id,
-      );
+      const assignment = staffMember.assignments?.find((a) => a.id === svc.id);
       const updatedSvc = {
         ...svc,
-        price:
-          assignment?.price ||
-          svc.price ||
-          svc.min_price ||
-          0,
+        price: assignment?.price || svc.price || svc.min_price || 0,
         duration:
-          assignment?.duration ||
-          svc.estimated_time ||
-          svc.min_time ||
-          0,
+          assignment?.duration || svc.estimated_time || svc.min_time || 0,
       };
       return {
         ...updatedSvc,
@@ -116,17 +108,21 @@ export default function OrderSidebar({
       };
     });
   }, [selectedProfessional, staff, selectedServices]);
-  const totalBasePrice = selectedStaffServices.reduce((sum, s) => sum + Number(s.price || s.min_price) * (s.qty || 1), 0);
-  const totalDuration = selectedStaffServices.reduce((sum, s) => sum + Number(s.duration) * (s.qty || 1), 0);
+  const totalBasePrice = selectedStaffServices.reduce(
+    (sum, s) => sum + Number(s.price || s.min_price) * (s.qty || 1),
+    0,
+  );
+  const totalDuration = selectedStaffServices.reduce(
+    (sum, s) => sum + Number(s.duration) * (s.qty || 1),
+    0,
+  );
   const requiredSlots = Math.ceil(totalDuration / SLOT_INTERVAL);
   const formatTimeRange = (startIndex: number): string => {
     if (!allSlots.length) return "";
-    const start = allSlots[startIndex]?.start_time;
-    const endSlot =
-      allSlots[startIndex + requiredSlots - 1];
+    const start = allSlots[startIndex]?.start_time_12h;
+    const endSlot = allSlots[startIndex + requiredSlots - 1];
     if (!start || !endSlot) return "";
-    const end =
-      endSlot.end_time || endSlot.start_time;
+    const end = endSlot.end_time_12h ?? endSlot.start_time_12h;
     return `${start} - ${end}`;
   };
 
@@ -136,11 +132,13 @@ export default function OrderSidebar({
     year: startDate.year,
   };
   const selectedStartIndex = selectedSlotIndexes?.[0];
-  const timeRange = selectedStartIndex !== undefined
-    ? formatTimeRange(selectedStartIndex)
-    : null;
+  const timeRange =
+    selectedStartIndex !== undefined
+      ? formatTimeRange(selectedStartIndex)
+      : null;
   const monthIndex = safeDate.month ?? 0;
-  const dateStr = timeRange ? `${MONTH_NAMES[monthIndex - 1]} ${safeDate.day} at ${timeRange}`
+  const dateStr = timeRange
+    ? `${MONTH_NAMES[monthIndex - 1]} ${safeDate.day} at ${timeRange}`
     : null;
   const taxAmt = selectedStaffServices.reduce((sum, s) => sum + s.tax, 0);
   const safeTipPct = Number(tipPct) || 0;
@@ -153,9 +151,7 @@ export default function OrderSidebar({
     }
   }, [showTip, tipPct, onTipChange]);
 
-  const finalButtonText = useMemo<
-    ReactNode
-  >(() => {
+  const finalButtonText = useMemo<ReactNode>(() => {
     if (loading) return "Processing...";
 
     if (checkingConsent) return "Checking consents...";
@@ -184,18 +180,26 @@ export default function OrderSidebar({
     const calculateHeight = (): void => {
       const firstHeight = firstRef.current?.offsetHeight || 0;
       const thirdHeight = thirdRef.current?.offsetHeight || 0;
-      const totalOffset = ((firstHeight +
-        (isCustomTip
-          ? window.innerWidth <= 991 ? 190 : 205
-          : showTip
-            ? window.innerWidth <= 991 ? 190 : 205
-            : window.innerWidth <= 991 ? 190 : 205)) ||
-        0) + thirdHeight;
+      const totalOffset =
+        (firstHeight +
+          (isCustomTip
+            ? window.innerWidth <= 991
+              ? 190
+              : 205
+            : showTip
+              ? window.innerWidth <= 991
+                ? 190
+                : 205
+              : window.innerWidth <= 991
+                ? 190
+                : 205) || 0) + thirdHeight;
 
       setSecondHeight(window.innerHeight - totalOffset);
     };
     calculateHeight();
-    const resizeObserver = new ResizeObserver(() => { calculateHeight() });
+    const resizeObserver = new ResizeObserver(() => {
+      calculateHeight();
+    });
     if (thirdRef.current) {
       resizeObserver.observe(thirdRef.current);
     }
@@ -220,7 +224,10 @@ export default function OrderSidebar({
       <div className="aaravpos-order-header">
         <p className="aaravpos-order-title">
           Your Order
-          <button className="aaravpos-sidebar-close-btn" onClick={() => dispatch(setSidebarOpen(false))}>
+          <button
+            className="aaravpos-sidebar-close-btn"
+            onClick={() => dispatch(setSidebarOpen(false))}
+          >
             <X size={18} />
           </button>
         </p>
@@ -241,9 +248,7 @@ export default function OrderSidebar({
               </div>
             )}
             <div className="aaravpos-pro-info">
-              <p className="aaravpos-pro-name">
-                {selectedProfessional.name}
-              </p>
+              <p className="aaravpos-pro-name">{selectedProfessional.name}</p>
               <p className="aaravpos-pro-type">
                 {selectedProfessional.staff_type}
               </p>
@@ -253,27 +258,21 @@ export default function OrderSidebar({
         <div className="aaravpos-date-time">
           <span className="aaravpos-date-time-label">Date & Time:</span>
           {dateStr ? (
-            <span className="aaravpos-date-time-value">
-              {dateStr}
-            </span>
+            <span className="aaravpos-date-time-value">{dateStr}</span>
           ) : (
-            <span className="aaravpos-date-time-empty">
-              No time selected
-            </span>
+            <span className="aaravpos-date-time-empty">No time selected</span>
           )}
         </div>
       </div>
-      <ul className="aaravpos-order-list" style={{ height: `${secondHeight}px` }}>
+      <ul
+        className="aaravpos-order-list"
+        style={{ height: `${secondHeight}px` }}
+      >
         {selectedStaffServices?.length > 0 &&
           selectedStaffServices.map((svc) => (
-            <li
-              key={svc.id}
-              className="aaravpos-order-item"
-            >
+            <li key={svc.id} className="aaravpos-order-item">
               <div className="aaravpos-main-text">
-                <p className="aaravpos-order-service-name">
-                  {svc.name}
-                </p>
+                <p className="aaravpos-order-service-name">{svc.name}</p>
               </div>
               <div className="aaravpos-order-details">
                 <div className="aaravpos-order-detail">
@@ -291,70 +290,48 @@ export default function OrderSidebar({
                 </p>
               </div>
             </li>
-          ),
-          )}
+          ))}
       </ul>
       <div className="third" ref={thirdRef}>
         {showTip && (
           <>
-            <p className="aaravpos-tip-title">
-              Add Tip
-            </p>
+            <p className="aaravpos-tip-title">Add Tip</p>
             <div className="aaravpos-tip-options">
-              {[...TIP_OPTIONS, "custom"].map(
-                (item, index) => {
-                  const isCustom =
-                    item === "custom";
+              {[...TIP_OPTIONS, "custom"].map((item, index) => {
+                const isCustom = item === "custom";
 
-                  const isActive = isCustom
-                    ? isCustomTip
-                    : safeTipPct === item;
+                const isActive = isCustom ? isCustomTip : safeTipPct === item;
 
-                  const isFirst = index === 0;
+                const isFirst = index === 0;
 
-                  const isLast =
-                    index ===
-                    [...TIP_OPTIONS, "custom"]
-                      .length -
-                    1;
-                  return (
-                    <button
-                      key={item}
-                      onClick={() => {
-                        if (isCustom) {
-                          setIsCustomTip(true);
+                const isLast = index === [...TIP_OPTIONS, "custom"].length - 1;
+                return (
+                  <button
+                    key={item}
+                    onClick={() => {
+                      if (isCustom) {
+                        setIsCustomTip(true);
 
-                          onTipChange?.(
-                            Number(customTip) || 0,
-                          );
-                        } else {
-                          setIsCustomTip(false);
+                        onTipChange?.(Number(customTip) || 0);
+                      } else {
+                        setIsCustomTip(false);
 
-                          setCustomTip("");
+                        setCustomTip("");
 
-                          onTipChange?.(
-                            Number(item),
-                          );
-                        }
-                      }}
-                      className={`aaravpos-tip-btn  
-                        ${isFirst || isLast
-                          ? "aaravpos-tip-btn-fixed"
-                          : "aaravpos-tip-btn-flex"
-                        } ${isActive
-                          ? "aaravpos-tip-btn-active"
-                          : ""
-                        }`}
-                    >
-                      {isCustom
-                        ? "Custom"
-                        : item === 0
-                          ? "No tip"
-                          : `${item}%`}
-                    </button>
-                  );
-                },
-              )}
+                        onTipChange?.(Number(item));
+                      }
+                    }}
+                    className={`aaravpos-tip-btn  
+                        ${
+                          isFirst || isLast
+                            ? "aaravpos-tip-btn-fixed"
+                            : "aaravpos-tip-btn-flex"
+                        } ${isActive ? "aaravpos-tip-btn-active" : ""}`}
+                  >
+                    {isCustom ? "Custom" : item === 0 ? "No tip" : `${item}%`}
+                  </button>
+                );
+              })}
             </div>
             {isCustomTip && (
               <div className="aaravpos-tip-input-wrapper">
@@ -367,9 +344,8 @@ export default function OrderSidebar({
                   onChange={(e) => {
                     const value = e.target.value;
                     if (
-                      value === "" || (Number(value) >= 0 &&
-                        Number(value) <=
-                        100)
+                      value === "" ||
+                      (Number(value) >= 0 && Number(value) <= 100)
                     ) {
                       setCustomTip(value);
                       onTipChange?.(Number(value) || 0);
@@ -381,22 +357,21 @@ export default function OrderSidebar({
             )}
           </>
         )}
-        {consentRequired &&
-          consentCompleted < totalConsents && (
-            <div className="aaravpos-consent-box">
-              <p className="aaravpos-consent-text">
-                Consent Required:{" "}
-                {consentCompleted}/
-                {totalConsents} completed
-              </p>
-              <div className="aaravpos-consent-progress">
-                <div
-                  className="aaravpos-consent-progress-bar"
-                  style={{ width: `${(consentCompleted / totalConsents) * 100}%` }}
-                />
-              </div>
+        {consentRequired && consentCompleted < totalConsents && (
+          <div className="aaravpos-consent-box">
+            <p className="aaravpos-consent-text">
+              Consent Required: {consentCompleted}/{totalConsents} completed
+            </p>
+            <div className="aaravpos-consent-progress">
+              <div
+                className="aaravpos-consent-progress-bar"
+                style={{
+                  width: `${(consentCompleted / totalConsents) * 100}%`,
+                }}
+              />
             </div>
-          )}
+          </div>
+        )}
         <div className="aaravpos-mt-auto">
           <PriceRow
             label="Service"
@@ -418,23 +393,20 @@ export default function OrderSidebar({
               }
             />
           )}
-          {(!showTaxesOnlyIfTime ||
-            timeRange) && (
-              <PriceRow
-                label="Taxes"
-                value={
-                  <>
-                    <CurrencyIcon size={14} />
-                    {taxAmt.toFixed(2)}
-                  </>
-                }
-              />
-            )}
+          {(!showTaxesOnlyIfTime || timeRange) && (
+            <PriceRow
+              label="Taxes"
+              value={
+                <>
+                  <CurrencyIcon size={14} />
+                  {taxAmt.toFixed(2)}
+                </>
+              }
+            />
+          )}
           <div className="aaravpos-divider" />
           <div className="aaravpos-order-subtotal">
-            <span className="aaravpos-order-subtotal-label">
-              Total
-            </span>
+            <span className="aaravpos-order-subtotal-label">Total</span>
             <span className="aaravpos-order-subtotal-price">
               <CurrencyIcon size={16} />
               {total.toFixed(2)}
@@ -452,7 +424,7 @@ export default function OrderSidebar({
           </button>
         </div>
       </div>
-    </div >
+    </div>
   );
 }
 
@@ -461,16 +433,11 @@ interface PriceRowProps {
   value: ReactNode;
 }
 
-function PriceRow({
-  label,
-  value,
-}: PriceRowProps): JSX.Element {
+function PriceRow({ label, value }: PriceRowProps): JSX.Element {
   return (
     <div className="aaravpos-summary-row">
       <span className="aaravpos-summary-label">{label}</span>
-      <span className="aaravpos-summary-value">
-        {value}
-      </span>
+      <span className="aaravpos-summary-value">{value}</span>
     </div>
   );
 }
