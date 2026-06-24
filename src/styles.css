@@ -3136,8 +3136,8 @@
 .aaravpos-card-box {
   background-color: #ffffff;
   border: 1px solid var(--btn-bg);
-  border-radius: 2px;
-  padding: 14px;
+  border-radius: 4px;
+  padding: 16px;
   margin-bottom: 8px;
   font-size: 14px;
 }
@@ -3657,7 +3657,7 @@
   }
 
   .aaravpos-layout-wrapper {
-    grid-template-columns: minmax(0, 1fr) 360px;
+    grid-template-columns: minmax(0, 1fr) 290px;
   }
 
   .aaravpos-sidebar-mobile {
@@ -3771,7 +3771,7 @@
     margin-bottom: 10px;
   }
 
-  .aaravpos-barber-sidebar {
+  .aaravpos-sidebar {
     display: none;
   }
 
@@ -3789,11 +3789,42 @@
   .aaravpos-outlet-grid {
     grid-template-columns: repeat(4, 1fr);
   }
+
+  .aaravpos-layout-wrapper {
+    grid-template-columns: minmax(0, 1fr) 280px;
+  }
+}
+
+@media (min-width: 1350px) {
+  .aaravpos-layout-wrapper {
+    grid-template-columns: minmax(0, 1fr) 250px;
+  }
+}
+
+@media (min-width: 1440px) {
+  .aaravpos-layout-wrapper {
+    grid-template-columns: minmax(0, 1fr) 200px;
+  }
 }
 
 @media (min-width: 1536px) {
   .aaravpos-outlet-grid {
     grid-template-columns: repeat(5, 1fr);
+  }
+  .aaravpos-layout-wrapper {
+    grid-template-columns: minmax(0, 1fr) 150px;
+  }
+}
+
+@media (min-width: 1710px) {
+  .aaravpos-layout-wrapper {
+    grid-template-columns: minmax(0, 1fr) 60px;
+  }
+}
+
+@media (min-width: 1840px) {
+  .aaravpos-layout-wrapper {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
