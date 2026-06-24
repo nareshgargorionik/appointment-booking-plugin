@@ -172,7 +172,7 @@ export default function TimePage(): JSX.Element {
         }),
     );
   };
-  
+
   useEffect(() => {
     if (selectedDate || !selectedProfessional) return;
 
@@ -389,17 +389,15 @@ export default function TimePage(): JSX.Element {
   }, [selectedSlotIndexes, allSlots, amSlots, pmSlots, evSlots]);
 
   useEffect(() => {
-    if (!loading) {
-      dispatch(setSelectedTime(null));
+    dispatch(setSelectedTime(null));
 
-      dispatch(
-        setSelectedSlots({
-          indexes: [],
-          ids: [],
-        }),
-      );
-    }
-  }, [loading, selectedDate, dispatch]);
+    dispatch(
+      setSelectedSlots({
+        indexes: [],
+        ids: [],
+      }),
+    );
+  }, [selectedDate, dispatch]);
 
   return (
     <MainLayout
