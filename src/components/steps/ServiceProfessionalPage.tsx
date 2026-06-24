@@ -310,6 +310,9 @@ export default function ServiceProfessionalPage() {
                             onClick={(e) => {
                               e.stopPropagation();
                               dispatch(decrementService(String(svc.id)));
+                              if (window.innerWidth > 991) {
+                                dispatch(setSidebarOpen(true))
+                              }
                             }}
                             className="aaravpos-service-action-btn"
                           >
@@ -335,6 +338,9 @@ export default function ServiceProfessionalPage() {
                                 );
                               } else {
                                 dispatch(incrementService(String(svc.id)));
+                              }
+                              if (window.innerWidth > 991) {
+                                dispatch(setSidebarOpen(true))
                               }
                             }}
                             className="aaravpos-service-action-btn plus"

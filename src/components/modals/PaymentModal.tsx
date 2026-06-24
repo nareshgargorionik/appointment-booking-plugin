@@ -78,17 +78,17 @@ export default function PaymentModal({
     };
 
     return (
-        <div className="arravpos-payment-overlay">
-            <form onSubmit={handleSubmit(onSubmit)} className="arravpos-payment-form">
+        <div className="aaravpos-payment-overlay">
+            <form onSubmit={handleSubmit(onSubmit)} className="aaravpos-payment-form">
                 <div className="aaravpos-modal">
-                    <div className="arravpos-payment-header">
-                        <h2 className="arravpos-payment-title">Make a payment</h2>
-                        <span className="arravpos-payment-amount"><CurrencyIcon size={14} />{amount?.toFixed(2)}</span>
+                    <div className="aaravpos-payment-header">
+                        <h2 className="aaravpos-payment-title">Make a payment</h2>
+                        <span className="aaravpos-payment-amount"><CurrencyIcon size={14} />{amount?.toFixed(2)}</span>
                     </div>
-                    <div className="arravpos-payment-fields">
+                    <div className="aaravpos-payment-fields">
                         <div className="aaravpos-form-control">
-                            <label htmlFor="name" className="arravpos-payment-label">
-                                Card Holder Name <span className="arravpos-payment-required">*</span>
+                            <label htmlFor="name" className="aaravpos-payment-label">
+                                Card Holder Name <span className="aaravpos-payment-required">*</span>
                             </label>
                             <Controller
                                 name="name"
@@ -115,17 +115,17 @@ export default function PaymentModal({
 
                                             field.onChange(value);
                                         }}
-                                        className="arravpos-custom-input"
+                                        className="aaravpos-custom-input"
                                     />
                                 )}
                             />
                             {errors.name && (
-                                <p className="arravpos-payment-error">{errors.name.message}</p>
+                                <p className="aaravpos-payment-error">{errors.name.message}</p>
                             )}
                         </div>
                         <div className="aaravpos-form-control">
-                            <label htmlFor="number" className="arravpos-payment-label">
-                                Card Number <span className="arravpos-payment-required">*</span>
+                            <label htmlFor="number" className="aaravpos-payment-label">
+                                Card Number <span className="aaravpos-payment-required">*</span>
                             </label>
                             <Controller
                                 name="number"
@@ -149,20 +149,20 @@ export default function PaymentModal({
                                                 )
                                             );
                                         }}
-                                        className="arravpos-custom-input"
+                                        className="aaravpos-custom-input"
                                     />
                                 )}
                             />
                             {errors.number && (
-                                <p className="arravpos-payment-error">
+                                <p className="aaravpos-payment-error">
                                     {errors.number.message}
                                 </p>
                             )}
                         </div>
-                        <div className="arravpos-payment-grid">
+                        <div className="aaravpos-payment-grid">
                             <div className="aaravpos-form-control">
-                                <label htmlFor="expiry" className="arravpos-payment-label">
-                                    Expiry Date <span className="arravpos-payment-required">*</span>
+                                <label htmlFor="expiry" className="aaravpos-payment-label">
+                                    Expiry Date <span className="aaravpos-payment-required">*</span>
                                 </label>
                                 <Controller
                                     name="expiry"
@@ -198,19 +198,19 @@ export default function PaymentModal({
                                                     )
                                                 );
                                             }}
-                                            className="arravpos-custom-input"
+                                            className="aaravpos-custom-input"
                                         />
                                     )}
                                 />
                                 {errors.expiry && (
-                                    <p className="arravpos-payment-error">
+                                    <p className="aaravpos-payment-error">
                                         {errors.expiry.message}
                                     </p>
                                 )}
                             </div>
                             <div className="aaravpos-form-control">
-                                <label htmlFor="cvv" className="arravpos-payment-label">
-                                    CVV <span className="arravpos-payment-required">*</span>
+                                <label htmlFor="cvv" className="aaravpos-payment-label">
+                                    CVV <span className="aaravpos-payment-required">*</span>
                                 </label>
                                 <Controller
                                     name="cvv"
@@ -235,33 +235,33 @@ export default function PaymentModal({
                                                     )
                                                 );
                                             }}
-                                            className="arravpos-custom-input"
+                                            className="aaravpos-custom-input"
                                         />
                                     )}
                                 />
                                 {errors.cvv && (
-                                    <p className="arravpos-payment-error">
+                                    <p className="aaravpos-payment-error">
                                         {errors.cvv.message}
                                     </p>
                                 )}
                             </div>
                         </div>
                     </div>
-                    <div className="arravpos-payment-btn-grid">
+                    <div className="aaravpos-payment-btn-grid">
                         <button
                             type="button"
                             onClick={() => {
                                 reset();
                                 onClose();
                             }}
-                            className="arravpos-payment-cancel-btn"
+                            className="aaravpos-payment-cancel-btn"
                         >
                             Cancel
                         </button>
                         <button
                             type="submit"
                             disabled={isSubmitting}
-                            className="arravpos-payment-submit-btn"
+                            className="aaravpos-payment-submit-btn"
                         >
                             {isSubmitting
                                 ? "Processing..."

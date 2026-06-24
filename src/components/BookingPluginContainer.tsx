@@ -96,7 +96,7 @@ export const BookingPluginContainer: React.FC<AppointmentBookingPluginProps> = (
 
 
     if (error) {
-        return (<div className="arravpos-error-box">{error}</div>);
+        return (<div className="aaravpos-error-box">{error}</div>);
     }
     if (!outlets.length && loading) {
         return (

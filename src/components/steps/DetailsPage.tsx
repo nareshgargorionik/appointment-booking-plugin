@@ -182,15 +182,15 @@ export default function DetailsPage(): JSX.Element {
         >
             <form>
                 <Breadcrumb />
-                <div className="arravpos-details-section aaravpos-margin-top-20">
+                <div className="aaravpos-details-section aaravpos-margin-top-20">
                     <h1 className="aaravpos-page-title aaravpos-margin-bottom-20">
                         Your Details
                     </h1>
-                    <div className="arravpos-details-scroll">
-                        <div className="arravpos-details-grid">
-                            <div className="arravpos-form-group">
-                                <label className="arravpos-form-label" htmlFor="phone">
-                                    Phone {!emailValue && (<span className="arravpos-required">*</span>)}
+                    <div className="aaravpos-details-scroll">
+                        <div className="aaravpos-details-grid">
+                            <div className="aaravpos-form-group">
+                                <label className="aaravpos-form-label" htmlFor="phone">
+                                    Phone {!emailValue && (<span className="aaravpos-required">*</span>)}
                                 </label>
                                 <Controller
                                     control={control}
@@ -209,7 +209,7 @@ export default function DetailsPage(): JSX.Element {
                                         },
                                     }}
                                     render={({ field }) => (
-                                        <div className="arravpos-input-wrapper">
+                                        <div className="aaravpos-input-wrapper">
                                             <PhoneInput
                                                 {...field}
                                                 id="phone"
@@ -221,31 +221,31 @@ export default function DetailsPage(): JSX.Element {
                                                     handleInputChange(value ?? "", field.onChange, "phone")
                                                 }
                                                 countryCallingCodeEditable={false}
-                                                className="arravpos-custom-input"
+                                                className="aaravpos-custom-input"
                                             />
 
                                             {loading && loadingField === "phone" && (
-                                                <div className="arravpos-loader-wrapper">
-                                                    <div className="arravpos-loader" />
+                                                <div className="aaravpos-loader-wrapper">
+                                                    <div className="aaravpos-loader" />
                                                 </div>
                                             )}
                                         </div>
                                     )}
                                 />
                                 {errors.phone && (
-                                    <p className="arravpos-error-text">
+                                    <p className="aaravpos-error-text">
                                         {errors.phone.message}
                                     </p>
                                 )}
                                 {isAutoFilled && (
-                                    <div className="arravpos-autofill-text">
-                                        Using existing customer <span onClick={handleClearCustomer} className="arravpos-clear-text">Clear</span>
+                                    <div className="aaravpos-autofill-text">
+                                        Using existing customer <span onClick={handleClearCustomer} className="aaravpos-clear-text">Clear</span>
                                     </div>
                                 )}
                             </div>
-                            <div className="arravpos-form-group">
-                                <label htmlFor="email" className="arravpos-form-label">
-                                    Email {!phoneValue && (<span className="arravpos-required">*</span>)}
+                            <div className="aaravpos-form-group">
+                                <label htmlFor="email" className="aaravpos-form-label">
+                                    Email {!phoneValue && (<span className="aaravpos-required">*</span>)}
                                 </label>
                                 <input
                                     id="email"
@@ -267,17 +267,17 @@ export default function DetailsPage(): JSX.Element {
                                     })}
                                     autoComplete="email"
                                     placeholder="Email address"
-                                    className="arravpos-custom-input"
+                                    className="aaravpos-custom-input"
                                 />
                                 {errors.firstName && (
-                                    <p className="arravpos-error-text">
+                                    <p className="aaravpos-error-text">
                                         {errors.firstName.message}
                                     </p>
                                 )}
                             </div>
-                            <div className="arravpos-form-group">
-                                <label htmlFor="first_name" className="arravpos-form-label">
-                                    First Name{" "} <span className="arravpos-required">*</span>
+                            <div className="aaravpos-form-group">
+                                <label htmlFor="first_name" className="aaravpos-form-label">
+                                    First Name{" "} <span className="aaravpos-required">*</span>
                                 </label>
                                 <input
                                     id="first_name"
@@ -290,16 +290,16 @@ export default function DetailsPage(): JSX.Element {
                                     })}
                                     autoComplete="given-name"
                                     placeholder="First Name"
-                                    className="arravpos-custom-input"
+                                    className="aaravpos-custom-input"
                                 />
                                 {errors.firstName && (
-                                    <p className="arravpos-error-text">
+                                    <p className="aaravpos-error-text">
                                         {errors.firstName.message}
                                     </p>
                                 )}
                             </div>
-                            <div className="arravpos-form-group">
-                                <label htmlFor="last_name" className="arravpos-form-label">
+                            <div className="aaravpos-form-group">
+                                <label htmlFor="last_name" className="aaravpos-form-label">
                                     Last Name
                                 </label>
                                 <input
@@ -307,7 +307,7 @@ export default function DetailsPage(): JSX.Element {
                                     autoComplete="family-name"
                                     {...register("lastName")}
                                     placeholder="Last Name"
-                                    className="arravpos-custom-input"
+                                    className="aaravpos-custom-input"
                                 />
                             </div>
                         </div>

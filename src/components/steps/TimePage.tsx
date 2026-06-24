@@ -20,13 +20,14 @@ import {
 import { getUserName } from "@/utils";
 import { nextStep } from "@/slices/breadcrumbSlice";
 import { OutletRootState, SlotItem, DateItem, Slot } from "@/types";
-import OrderSidebar from "@/components/sidebar/OrderSidebar";
 import MainLayout from "@/components/common/MainLayout";
 import Breadcrumb from "@/components/common/Breadcrumb";
 import CalendarOverlay from "@/components/common/CalendarOverlay";
 // import { useWindowSize } from "@/hooks/useWindowSize";
 import type { AppDispatch } from "@/store";
 import { isDateDisabled } from "@/utils/isDateDisabled";
+import OrderSidebar from "@/components/sidebar/OrderSidebar";
+import SlotSkeleton from "@/components/common/SlotSkeleton";
 
 const MONTH_NAMES = [
   "Jan",
@@ -42,27 +43,35 @@ const MONTH_NAMES = [
   "Nov",
   "Dec",
 ];
+
 const WEEK_DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-const SLOT_INTERVAL = 15;
 
 export default function TimePage(): JSX.Element {
   const dispatch = useDispatch<AppDispatch>();
+  // const { height } = useWindowSize();
+
   const [visibleCount, setVisibleCount] = useState<number>(11);
+
   const { staff, selectedServices, selectedProfessional } = useSelector(
     (state: OutletRootState) => state.booking.service,
   );
 
   const { tenantId, timeZone } = useSelector(
-    (state: OutletRootState) => state.booking?.outletDetails,
+    (state: OutletRootState) => state?.booking?.outletDetails,
   );
 
   const { selectedSlotIndexes, selectedDate, selectedTime, slots, loading } =
     useSelector((state: OutletRootState) => state.booking.slots);
+
   const [calOpen, setCalOpen] = useState<boolean>(false);
   const [stripStart, setStripStart] = useState<number>(0);
+
+  const SLOT_INTERVAL = 15;
+
   const allSlots = useMemo(() => {
     return [slots.morning, slots.afternoon, slots.evening].flat();
   }, [slots]);
+
   const startDate = useMemo(
     () => DateTime.now().setZone(timeZone).startOf("day"),
     [timeZone],
@@ -104,10 +113,14 @@ export default function TimePage(): JSX.Element {
 
   const selectedStaffServices = useMemo(() => {
     if (!selectedProfessional?.id) return [];
+
     const staffMember = staff?.find((s) => s.id === selectedProfessional.id);
+
     if (!staffMember) return [];
+
     return selectedServices.map((svc) => {
       const assignment = staffMember.assignments?.find((a) => a.id === svc.id);
+
       return {
         ...svc,
         price: assignment?.price || svc.price || svc.min_price || 0,
@@ -122,14 +135,18 @@ export default function TimePage(): JSX.Element {
     (sum, s) => sum + Number(s.duration) * (s.qty || 1),
     0,
   );
+
   const durationMins = totalDuration;
+
   const requiredSlots = Math.ceil(durationMins / SLOT_INTERVAL);
+
   const formattedDate = selectedDate
     ? DateTime.fromObject(selectedDate).toFormat("yyyy-MM-dd")
     : null;
 
   useEffect(() => {
     if (!selectedProfessional?.id || !formattedDate) return;
+
     dispatch(
       getStaffSlots({
         tenantId,
@@ -159,13 +176,16 @@ export default function TimePage(): JSX.Element {
 
   useEffect(() => {
     if (!selectedDate || !dates.length) return;
+
     const selectedIndex = dates.findIndex(
       (d) =>
         d.day === selectedDate.day &&
         d.month === selectedDate.month &&
         d.year === selectedDate.year,
     );
+
     if (selectedIndex === -1) return;
+
     const newStart = Math.max(
       0,
       Math.min(
@@ -173,6 +193,7 @@ export default function TimePage(): JSX.Element {
         selectedIndex - Math.floor(visibleCount / 2),
       ),
     );
+
     setStripStart(newStart);
   }, [selectedDate, dates, visibleCount]);
 
@@ -214,28 +235,43 @@ export default function TimePage(): JSX.Element {
 
   const handleSlotSelect = (selectedIndex: number): void => {
     if (!allSlots.length) return;
+
     const selectedGroup = allSlots.slice(
       selectedIndex,
       selectedIndex + requiredSlots,
     );
+
     if (selectedGroup.length < requiredSlots) {
       toast.warning("You don't have sufficient time for selected service");
       return;
     }
+
     const hasBlocked = selectedGroup.some(
       (s) => s.isBooked || s.status !== "AVAILABLE" || s.disabled,
     );
+
     if (hasBlocked) {
       toast.warning("Selected time range is not fully available");
       return;
     }
+
     dispatch(setSelectedTime(allSlots[selectedIndex].start_time));
+
     const indexes = Array.from(
       { length: requiredSlots },
       (_, i) => selectedIndex + i,
     );
+
     const ids = indexes.map((i) => allSlots[i]?.id);
-    dispatch(setSelectedSlots({ indexes, ids }));
+
+    dispatch(
+      setSelectedSlots({
+        indexes,
+        ids,
+      }),
+    );
+
+    // Auto move to next step
     setTimeout(() => {
       dispatch(nextStep());
     }, 200);
@@ -243,41 +279,61 @@ export default function TimePage(): JSX.Element {
 
   useEffect(() => {
     if (!selectedTime || !allSlots.length) return;
+
     const startIndex = allSlots.findIndex(
       (slot) => slot.start_time === selectedTime,
     );
+
     if (startIndex === -1) return;
+
     const restoredIndexes = Array.from(
       { length: requiredSlots },
       (_, i) => startIndex + i,
     );
+
     const isSame =
       restoredIndexes.length === selectedSlotIndexes.length &&
       restoredIndexes.every((val, i) => val === selectedSlotIndexes[i]);
+
     if (!isSame) {
       const ids = restoredIndexes.map((i) => allSlots[i]?.id);
-      dispatch(setSelectedSlots({ indexes: restoredIndexes, ids }));
+
+      dispatch(
+        setSelectedSlots({
+          indexes: restoredIndexes,
+          ids,
+        }),
+      );
     }
   }, [selectedTime, allSlots, requiredSlots, selectedSlotIndexes]);
 
   useEffect(() => {
-    const updateCount = (): void => {
+    const updateCount = () => {
       const width = window.innerWidth;
-      if (width < 411) {
-        setVisibleCount(5);
-      } else if (width < 480) {
+      if (width < 350) {
+        setVisibleCount(2);
+      } else if (width < 420) {
+        setVisibleCount(3);
+      } else if (width < 575) {
+        setVisibleCount(4);
+      } else if (width < 680) {
         setVisibleCount(6);
-      } else if (width < 1024) {
-        setVisibleCount(5);
+      } else if (width < 991) {
+        setVisibleCount(8);
       } else if (width < 1280) {
-        setVisibleCount(7);
+        setVisibleCount(10);
       } else {
-        setVisibleCount(11);
+        setVisibleCount(12);
       }
     };
+
     updateCount();
+
     window.addEventListener("resize", updateCount);
-    return () => window.removeEventListener("resize", updateCount);
+
+    return () => {
+      window.removeEventListener("resize", updateCount);
+    };
   }, []);
 
   const amSlots = slots?.morning || [];
@@ -293,6 +349,7 @@ export default function TimePage(): JSX.Element {
     if (hasAvailable(amSlots)) return "morning";
     if (hasAvailable(pmSlots)) return "afternoon";
     if (hasAvailable(evSlots)) return "evening";
+
     return null;
   };
 
@@ -302,8 +359,11 @@ export default function TimePage(): JSX.Element {
 
   useEffect(() => {
     const firstSelectedIndex = selectedSlotIndexes[0];
+
     const selectedSlot = allSlots[firstSelectedIndex];
+
     if (!selectedSlot) return;
+
     if (amSlots.some((s) => s.id === selectedSlot.id)) {
       setOpenSection("morning");
     } else if (pmSlots.some((s) => s.id === selectedSlot.id)) {
@@ -312,6 +372,19 @@ export default function TimePage(): JSX.Element {
       setOpenSection("evening");
     }
   }, [selectedSlotIndexes, allSlots, amSlots, pmSlots, evSlots]);
+
+  useEffect(() => {
+    if (!loading) {
+      dispatch(setSelectedTime(null));
+
+      dispatch(
+        setSelectedSlots({
+          indexes: [],
+          ids: [],
+        }),
+      );
+    }
+  }, [loading, selectedDate, dispatch]);
 
   return (
     <MainLayout
@@ -330,7 +403,6 @@ export default function TimePage(): JSX.Element {
           />
         </div>
       }
-      renderButton={null}
     >
       <Breadcrumb />
       <div style={{ marginTop: 15 }}>
@@ -338,11 +410,12 @@ export default function TimePage(): JSX.Element {
           Choose a Time
         </h1>
       </div>
-      <div className="arravpos-date-wrapper">
-        <div className="arravpos-date-strip">
+      <div className="aaravpos-date-wrapper">
+        <div className="aaravpos-date-strip">
           <DateNavBtn onClick={() => handleShift(-1)}>
             <ChevronLeft size={20} />
           </DateNavBtn>
+
           {dates.slice(stripStart, stripStart + visibleCount).map((d) => {
             const dt = DateTime.fromObject(
               {
@@ -354,13 +427,18 @@ export default function TimePage(): JSX.Element {
                 zone: timeZone || "UTC",
               },
             );
+
             const dow = dt.weekday % 7;
+
             const today = DateTime.now().setZone(timeZone).startOf("day");
+
             const isToday = dt.hasSame(today, "day");
+
             const isSelected =
               selectedDate?.day === d.day &&
               selectedDate?.month === d.month &&
               selectedDate?.year === d.year;
+
             const normalizedDate = dt.startOf("day");
 
             const isPastDate = normalizedDate < startDate;
@@ -375,6 +453,7 @@ export default function TimePage(): JSX.Element {
                 selectedProfessional,
                 outletTimeZone: timeZone || "UTC",
               });
+
             return (
               <div
                 key={`${d.day}-${d.month}-${d.year}`}
@@ -384,35 +463,51 @@ export default function TimePage(): JSX.Element {
                   }
                 }}
                 className={[
-                  "arravpos-date-card",
+                  "aaravpos-date-card",
+
                   isPastDate || isAfterLimit
-                    ? "arravpos-date-card-disabled"
+                    ? "aaravpos-date-card-disabled"
                     : isDisabled
-                      ? "arravpos-date-card-disabled"
+                      ? "aaravpos-date-card-disabled"
                       : isSelected
-                        ? "arravpos-date-card-active"
-                        : "arravpos-date-card-default",
+                        ? "aaravpos-date-card-active"
+                        : "aaravpos-date-card-default",
                 ]
                   .filter(Boolean)
                   .join(" ")}
               >
-                {isDisabled && <div className="arravpos-date-disabled-slash" />}
-                <span className="arravpos-date-week">{WEEK_DAYS[dow]}</span>
-                <span className="arravpos-date-day">{d.day}</span>
-                {isToday && <span className="arravpos-date-today">TODAY</span>}
+                {/* Slash Line */}
                 {isDisabled && (
-                  <span className="arravpos-date-unavailable">UNAVAILABLE</span>
+                  <div className="aaravpos-date-disabled-slash" />
+                )}
+
+                <span className="aaravpos-date-week">
+                  {WEEK_DAYS[dow]}
+                </span>
+
+                <span className="aaravpos-date-day">{d.day}</span>
+
+                {isToday && (
+                  <span className="aaravpos-date-today">TODAY</span>
+                )}
+
+                {isDisabled && (
+                  <span className="aaravpos-date-unavailable">
+                    UNAVAILABLE
+                  </span>
                 )}
               </div>
             );
           })}
+
           <DateNavBtn onClick={() => handleShift(1)}>
             <ChevronRight size={20} />
           </DateNavBtn>
         </div>
+
         <button
           onClick={() => setCalOpen(true)}
-          className="arravpos-calendar-btn"
+          className="aaravpos-calendar-btn"
         >
           <Calendar1 size={16} />
 
@@ -421,77 +516,104 @@ export default function TimePage(): JSX.Element {
             : `${MONTH_NAMES[startDate.month - 1]} ${startDate.year}`}
         </button>
       </div>
-      <div className="arravpos-selected-professional">
+
+      <div className="aaravpos-selected-professional">
         {selectedProfessional?.imageUrl ? (
           <img
             src={selectedProfessional.imageUrl}
             alt={selectedProfessional.name}
-            className="arravpos-selected-professional-image"
+            className="aaravpos-selected-professional-image"
           />
         ) : (
           <div
-            className="arravpos-selected-professional-avatar"
-            style={{ background: selectedProfessional?.color || "#111" }}
+            className="aaravpos-selected-professional-avatar"
+            style={{
+              background: selectedProfessional?.color || "#111",
+            }}
           >
             {getUserName(selectedProfessional?.name)}
           </div>
         )}
-        <div className="arravpos-selected-professional-content">
-          <p className="arravpos-selected-professional-name">
+
+        <div className="aaravpos-selected-professional-content">
+          <p className="aaravpos-selected-professional-name">
             {selectedProfessional?.name}
           </p>
-          <p className="arravpos-selected-professional-services">
+
+          <p className="aaravpos-selected-professional-services">
             {selectedStaffServices.map((s: any) => s.name).join(", ")} ·{" "}
-            {totalDuration} mins
+            {totalDuration} min
           </p>
         </div>
       </div>
+
       <div
-        className="arravpos-scroll-area"
+        className="aaravpos-scroll-area"
         style={loading ? { height: 300 } : {}}
       >
         {loading ? (
-          <div className="arravpos-loader-wrapper">
-            <div className="arravpos-loader" />
-          </div>
+          <SlotSkeleton />
         ) : (
           <>
-            <SlotSection
-              label="Morning"
-              icon={<Sunrise size={18} className="arravpos-slot-icon" />}
-              slots={amSlots}
-              allSlots={allSlots}
-              selectedSlotIndexes={selectedSlotIndexes}
-              handleSlotSelect={handleSlotSelect}
-              isOpen={openSection === "morning"}
-              onToggle={() =>
-                setOpenSection(openSection === "morning" ? null : "morning")
-              }
-            />
-            <SlotSection
-              label="Afternoon"
-              icon={<Sun size={18} className="arravpos-slot-icon" />}
-              slots={pmSlots}
-              allSlots={allSlots}
-              selectedSlotIndexes={selectedSlotIndexes}
-              handleSlotSelect={handleSlotSelect}
-              isOpen={openSection === "afternoon"}
-              onToggle={() =>
-                setOpenSection(openSection === "afternoon" ? null : "afternoon")
-              }
-            />
-            <SlotSection
-              label="Evening"
-              icon={<Moon size={18} className="arravpos-slot-icon" />}
-              slots={evSlots}
-              allSlots={allSlots}
-              selectedSlotIndexes={selectedSlotIndexes}
-              handleSlotSelect={handleSlotSelect}
-              isOpen={openSection === "evening"}
-              onToggle={() =>
-                setOpenSection(openSection === "evening" ? null : "evening")
-              }
-            />
+            {!allSlots?.length ? (
+              <>
+                <div className="aaravpos-supercategory-wrapper"></div>
+                <div className="aaravpos-empty-services">
+                  <h3 className="aaravpos-empty-services-title">
+                    No Slots Found
+                  </h3>
+                  <p className="aaravpos-empty-services-text">
+                    No slots available for selected date. Please choose a
+                    different date.
+                  </p>
+                </div>
+              </>
+            ) : (
+              <>
+                <SlotSection
+                  label="Morning"
+                  icon={
+                    <Sunrise size={18} className="aaravpos-slot-icon" />
+                  }
+                  slots={amSlots}
+                  allSlots={allSlots}
+                  selectedSlotIndexes={selectedSlotIndexes}
+                  handleSlotSelect={handleSlotSelect}
+                  isOpen={openSection === "morning"}
+                  onToggle={() =>
+                    setOpenSection(openSection === "morning" ? null : "morning")
+                  }
+                />
+                <SlotSection
+                  label="Afternoon"
+                  icon={<Sun size={18} className="aaravpos-slot-icon" />}
+                  slots={pmSlots}
+                  allSlots={allSlots}
+                  selectedSlotIndexes={selectedSlotIndexes}
+                  handleSlotSelect={handleSlotSelect}
+                  isOpen={openSection === "afternoon"}
+                  onToggle={() =>
+                    setOpenSection(
+                      openSection === "afternoon" ? null : "afternoon",
+                    )
+                  }
+                />
+                <SlotSection
+                  label="Evening"
+                  icon={
+                    <Moon size={18} className="aaravpos-slot-icon" />
+                  }
+                  slots={evSlots}
+                  allSlots={allSlots}
+                  selectedSlotIndexes={selectedSlotIndexes}
+                  handleSlotSelect={handleSlotSelect}
+                  isOpen={openSection === "evening"}
+                  onToggle={() =>
+                    setOpenSection(openSection === "evening" ? null : "evening")
+                  }
+                />{" "}
+              </>
+            )}
           </>
         )}
         <CalendarOverlay isOpen={calOpen} onClose={() => setCalOpen(false)} />
@@ -507,7 +629,7 @@ interface DateNavBtnProps {
 
 function DateNavBtn({ onClick, children }: DateNavBtnProps): JSX.Element {
   return (
-    <button onClick={onClick} className="arravpos-date-nav-btn">
+    <button onClick={onClick} className="aaravpos-date-nav-btn">
       {children}
     </button>
   );
@@ -535,31 +657,38 @@ function SlotSection({
   onToggle,
 }: SlotSectionProps): JSX.Element | null {
   if (!slots || slots?.length === 0) return null;
-  // const dispatch = useDispatch<AppDispatch>();
   return (
-    <div className="arravpos-slot-section">
-      <div onClick={onToggle} className="arravpos-slot-section-header">
-        <div className="arravpos-slot-section-title">
-          <span>{icon}</span> {label}
+    <div className="aaravpos-slot-section">
+      <div onClick={onToggle} className="aaravpos-slot-section-header">
+        <div className="aaravpos-slot-section-title">
+          <span>{icon}</span>
+
+          {label}
         </div>
+
         <span
-          className={`arravpos-slot-section-arrow ${isOpen ? "arravpos-slot-section-arrow-open" : ""}`}
+          className={`aaravpos-slot-section-arrow ${isOpen ? "aaravpos-slot-section-arrow-open" : ""
+            }`}
         >
           <ChevronDown />
         </span>
       </div>
+
       {isOpen && (
-        <div className="arravpos-slot-section-content">
-          <div className="arravpos-slot-grid">
+        <div className="aaravpos-slot-section-content">
+          <div className="aaravpos-slot-grid">
             {slots.map((slot: SlotItem) => {
               const globalIndex = allSlots.findIndex(
                 (s: SlotItem) => s.id === slot.id,
               );
+
               const isSelected = selectedSlotIndexes.includes(globalIndex);
+
               const isOnBreak = slot.disabled;
 
               const isDisabled =
                 slot.isBooked || slot.status !== "AVAILABLE" || isOnBreak;
+
               return (
                 <div
                   key={slot.id}
@@ -568,19 +697,18 @@ function SlotSection({
                       handleSlotSelect(globalIndex);
                     }
                   }}
-                  className={`arravpos-slot-card ${
-                    isDisabled
-                      ? "arravpos-slot-card-disabled"
-                      : isSelected
-                        ? "arravpos-slot-card-selected"
-                        : "arravpos-slot-card-default"
-                  }`}
+                  className={`aaravpos-slot-card ${isDisabled
+                    ? "aaravpos-slot-card-disabled"
+                    : isSelected
+                      ? "aaravpos-slot-card-selected"
+                      : "aaravpos-slot-card-default"
+                    }`}
                 >
-                  <span className="arravpos-slot-time">
+                  <span className="aaravpos-slot-time">
                     {slot.start_time_12h}
                   </span>
 
-                  <span className="arravpos-slot-status">
+                  <span className="aaravpos-slot-status">
                     {slot.disabled
                       ? ""
                       : slot.isBooked

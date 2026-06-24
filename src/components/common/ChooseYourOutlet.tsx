@@ -82,7 +82,7 @@ export default function ChooseYourOutlet({
   }, [outlets, searchTerm]);
 
   return (
-    <div className="arravpos-container">
+    <div className="aaravpos-container">
       <div className="aaravpos-header">
         <div>
           <h1 className="aaravpos-title">

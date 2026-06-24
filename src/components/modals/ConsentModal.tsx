@@ -86,34 +86,34 @@ const ConsentModal = ({
             : enforcement === "DRAW_SIGNATURE" ? !!signatureDataUrl : false);
 
     return (
-        <div className="arravpos-consent-overlay">
-            <div className="arravpos-consent-backdrop" />
-            <div className="arravpos-consent-modal">
+        <div className="aaravpos-consent-overlay">
+            <div className="aaravpos-consent-backdrop" />
+            <div className="aaravpos-consent-modal">
                 {/* Header */}
-                <div className="arravpos-consent-header">
-                    <h3 className="arravpos-consent-title">
+                <div className="aaravpos-consent-header">
+                    <h3 className="aaravpos-consent-title">
                         {heading || "Consent Form"}
                     </h3>
                     <button
                         onClick={handleClose}
-                        className="arravpos-consent-close-btn"
+                        className="aaravpos-consent-close-btn"
                     >
                         <X />
                     </button>
                 </div>
-                <div className="arravpos-consent-content-wrapper">
-                    <div className="arravpos-consent-content-box">
+                <div className="aaravpos-consent-content-wrapper">
+                    <div className="aaravpos-consent-content-box">
                         <div
                             dangerouslySetInnerHTML={{
                                 __html: consent,
                             }}
-                            className="arravpos-consent-content"
+                            className="aaravpos-consent-content"
                         />
                     </div>
                 </div>
                 <form onSubmit={handleSubmit(onSubmit)}>
                     {enforcement === "CHECKBOX_ONLY" && (
-                        <label className="arravpos-consent-checkbox-label" htmlFor="accepted">
+                        <label className="aaravpos-consent-checkbox-label" htmlFor="accepted">
                             <input
                                 type="checkbox"
                                 {...register("accepted", {
@@ -121,18 +121,18 @@ const ConsentModal = ({
                                         "You must accept terms",
                                 })}
                                 id="accepted"
-                                className="arravpos-consent-checkbox"
+                                className="aaravpos-consent-checkbox"
                             />
-                            <span className="arravpos-consent-checkbox-text">
+                            <span className="aaravpos-consent-checkbox-text">
                                 I have read and agree to the terms above
                             </span>
                         </label>
                     )}
                     {enforcement === "TYPED_NAME" && (
-                        <div className="arravpos-consent-typed-wrapper">
-                            <label className="arravpos-consent-input-label" htmlFor="typedName">
+                        <div className="aaravpos-consent-typed-wrapper">
+                            <label className="aaravpos-consent-input-label" htmlFor="typedName">
                                 Full Name
-                                <span className="arravpos-consent-required">
+                                <span className="aaravpos-consent-required">
                                     *
                                 </span>
                             </label>
@@ -146,16 +146,16 @@ const ConsentModal = ({
                                 })}
                                 id="typedName"
                                 placeholder="Type your full name"
-                                className={`arravpos-consent-input ${errors.typedName
-                                    ? "arravpos-consent-input-error"
-                                    : "arravpos-consent-input-normal"
+                                className={`aaravpos-consent-input ${errors.typedName
+                                    ? "aaravpos-consent-input-error"
+                                    : "aaravpos-consent-input-normal"
                                     }`}
                             />
-                            <p className="arravpos-consent-helper-text">
+                            <p className="aaravpos-consent-helper-text">
                                 By typing your name, you agree to the consent above
                             </p>
                             {errors.typedName && (
-                                <p className="arravpos-consent-error">
+                                <p className="aaravpos-consent-error">
                                     {errors.typedName.message}
                                 </p>
                             )}
@@ -173,12 +173,12 @@ const ConsentModal = ({
                                         : "Signature required",
                             }}
                             render={({ field }) => (
-                                <div className="arravpos-consent-signature-wrapper">
+                                <div className="aaravpos-consent-signature-wrapper">
                                     <SignatureCanvas
                                         ref={sigCanvasRef}
                                         canvasProps={{
                                             className:
-                                                "arravpos-consent-signature-canvas",
+                                                "aaravpos-consent-signature-canvas",
                                         }}
                                         onEnd={() => {
                                             const canvas =
@@ -197,23 +197,23 @@ const ConsentModal = ({
                                         }}
                                     />
                                     {errors.signatureDataUrl && (
-                                        <p className="arravpos-consent-error arravpos-consent-error-signature">
+                                        <p className="aaravpos-consent-error aaravpos-consent-error-signature">
                                             {errors.signatureDataUrl.message}
                                         </p>
                                     )}
-                                    <div className="arravpos-consent-signature-actions">
+                                    <div className="aaravpos-consent-signature-actions">
                                         <button
                                             type="button"
                                             onClick={
                                                 handleClearSignature
                                             }
-                                            className="arravpos-consent-clear-btn"
+                                            className="aaravpos-consent-clear-btn"
                                         >
                                             <RotateCw size={14} />
                                             Clear
                                         </button>
                                         <label
-                                            className="arravpos-consent-email-label"
+                                            className="aaravpos-consent-email-label"
                                             htmlFor="emailme"
                                         >
                                             <input
@@ -222,9 +222,9 @@ const ConsentModal = ({
                                                     "emailMe"
                                                 )}
                                                 id="emailme"
-                                                className="arravpos-consent-email-checkbox"
+                                                className="aaravpos-consent-email-checkbox"
                                             />
-                                            <span className="arravpos-consent-email-text">
+                                            <span className="aaravpos-consent-email-text">
                                                 Email me
                                             </span>
                                         </label>
@@ -233,20 +233,20 @@ const ConsentModal = ({
                             )}
                         />
                     )}
-                    <div className="arravpos-consent-footer">
+                    <div className="aaravpos-consent-footer">
                         <button
                             type="button"
                             onClick={handleClose}
-                            className="arravpos-consent-cancel-btn"
+                            className="aaravpos-consent-cancel-btn"
                         >
                             Cancel
                         </button>
                         <button
                             type="submit"
                             disabled={!canSubmit}
-                            className={`arravpos-consent-submit-btn ${!canSubmit
-                                ? "arravpos-consent-submit-disabled"
-                                : "arravpos-consent-submit-active"
+                            className={`aaravpos-consent-submit-btn ${!canSubmit
+                                ? "aaravpos-consent-submit-disabled"
+                                : "aaravpos-consent-submit-active"
                                 }`}
                         >
                             <Check />

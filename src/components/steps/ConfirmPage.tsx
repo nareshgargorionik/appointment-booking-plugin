@@ -142,8 +142,8 @@ export default function ConfirmPage(): JSX.Element {
 
   const debouncedFetchRef = useRef<
     | (((params: { value: string; type: "phone" | "email" }) => void) & {
-        cancel?: () => void;
-      })
+      cancel?: () => void;
+    })
     | null
   >(null);
 
@@ -815,7 +815,7 @@ export default function ConfirmPage(): JSX.Element {
             totalConsents={totalConsentCount}
             checkingConsent={checkingConsent}
             loading={loading}
-            // isBookingDisabled={isBookingDisabled()}
+          // isBookingDisabled={isBookingDisabled()}
           />
         </div>
       }
@@ -827,54 +827,54 @@ export default function ConfirmPage(): JSX.Element {
           <p className="aaravpos-sub-title">
             Review your appointment details before booking
           </p>
-          <div className="arravpos-booking-wrapper">
-            <div className="arravpos-outlet-info">
+          <div className="aaravpos-booking-wrapper">
+            <div className="aaravpos-outlet-info">
               {image && (
-                <div className="arravpos-outlet-logo">
+                <div className="aaravpos-outlet-logo">
                   <img
                     src={image ?? "/logo.svg"}
                     alt="Logo"
-                    className="arravpos-outlet-logo-img"
+                    className="aaravpos-outlet-logo-img"
                   />
                 </div>
               )}
-              <div className="arravpos-outlet-content">
-                <p className="arravpos-outlet-name">{outletName ?? "-"}</p>
-                <p className="arravpos-outlet-address">
+              <div className="aaravpos-outlet-content">
+                <p className="aaravpos-outlet-name">{outletName ?? "-"}</p>
+                <p className="aaravpos-outlet-address">
                   {address ?? "-"}
                   <br />
                 </p>
               </div>
             </div>
-            <div className="arravpos-booking-scroll">
-              <div className="arravpos-booking-grid">
-                <div className="arravpos-booking-column">
+            <div className="aaravpos-booking-scroll">
+              <div className="aaravpos-booking-grid">
+                <div className="aaravpos-booking-column">
                   <SectionLabel>Appointment</SectionLabel>
                   <Card>
-                    <div className="arravpos-appointment-header">
+                    <div className="aaravpos-appointment-header">
                       <Avatar pro={selectedProfessional} />
-                      <div className="arravpos-appointment-content">
-                        <p className="arravpos-appointment-name">
+                      <div className="aaravpos-appointment-content">
+                        <p className="aaravpos-appointment-name">
                           {selectedProfessional?.name}
                         </p>
-                        <p className="arravpos-appointment-services">
+                        <p className="aaravpos-appointment-services">
                           {services.map((s) => s.name).join(", ")}
                         </p>
                       </div>
-                      <span className="arravpos-appointment-price">
+                      <span className="aaravpos-appointment-price">
                         <CurrencyIcon size={14} />
                         {totalBasePrice}
                       </span>
                     </div>
-                    <div className="arravpos-appointment-date">
+                    <div className="aaravpos-appointment-date">
                       <CalendarDays size={18} />
-                      <span className="arravpos-appointment-date-text">
+                      <span className="aaravpos-appointment-date-text">
                         {dateStr ?? "No time selected"}
                       </span>
                     </div>
                   </Card>
                 </div>
-                <div className="arravpos-booking-column">
+                <div className="aaravpos-booking-column">
                   <SectionLabel>Payment Method</SectionLabel>
                   <PayOption
                     icon={<Store size={18} />}
@@ -892,12 +892,12 @@ export default function ConfirmPage(): JSX.Element {
               </div>
               {payType && (
                 <form className="aaravpos-tp-10">
-                  <div className="arravpos-details-grid">
-                    <div className="arravpos-form-group">
-                      <label className="arravpos-form-label" htmlFor="phone">
+                  <div className="aaravpos-details-grid">
+                    <div className="aaravpos-form-group">
+                      <label className="aaravpos-form-label" htmlFor="phone">
                         Phone{" "}
                         {!emailValue && (
-                          <span className="arravpos-required">*</span>
+                          <span className="aaravpos-required">*</span>
                         )}
                       </label>
                       <Controller
@@ -917,7 +917,7 @@ export default function ConfirmPage(): JSX.Element {
                           },
                         }}
                         render={({ field }) => (
-                          <div className="arravpos-input-wrapper">
+                          <div className="aaravpos-input-wrapper">
                             <PhoneInput
                               {...field}
                               id="phone"
@@ -933,39 +933,39 @@ export default function ConfirmPage(): JSX.Element {
                                 )
                               }
                               countryCallingCodeEditable={false}
-                              className="arravpos-custom-input"
+                              className="aaravpos-custom-input"
                             />
 
                             {formLoading && loadingField === "phone" && (
-                              <div className="arravpos-loader-wrapper">
-                                <div className="arravpos-loader" />
+                              <div className="aaravpos-loader-wrapper">
+                                <div className="aaravpos-loader" />
                               </div>
                             )}
                           </div>
                         )}
                       />
                       {errors.phone && (
-                        <p className="arravpos-error-text">
+                        <p className="aaravpos-error-text">
                           {errors.phone.message}
                         </p>
                       )}
                       {isAutoFilled && (
-                        <div className="arravpos-autofill-text">
+                        <div className="aaravpos-autofill-text">
                           Using existing customer{" "}
                           <span
                             onClick={handleClearCustomer}
-                            className="arravpos-clear-text"
+                            className="aaravpos-clear-text"
                           >
                             Clear
                           </span>
                         </div>
                       )}
                     </div>
-                    <div className="arravpos-form-group">
-                      <label htmlFor="email" className="arravpos-form-label">
+                    <div className="aaravpos-form-group">
+                      <label htmlFor="email" className="aaravpos-form-label">
                         Email{" "}
                         {!phoneValue && (
-                          <span className="arravpos-required">*</span>
+                          <span className="aaravpos-required">*</span>
                         )}
                       </label>
                       <input
@@ -988,20 +988,20 @@ export default function ConfirmPage(): JSX.Element {
                         })}
                         autoComplete="email"
                         placeholder="Email address"
-                        className="arravpos-custom-input"
+                        className="aaravpos-custom-input"
                       />
                       {errors.firstName && (
-                        <p className="arravpos-error-text">
+                        <p className="aaravpos-error-text">
                           {errors.firstName.message}
                         </p>
                       )}
                     </div>
-                    <div className="arravpos-form-group">
+                    <div className="aaravpos-form-group">
                       <label
                         htmlFor="first_name"
-                        className="arravpos-form-label"
+                        className="aaravpos-form-label"
                       >
-                        First Name <span className="arravpos-required">*</span>
+                        First Name <span className="aaravpos-required">*</span>
                       </label>
                       <input
                         id="first_name"
@@ -1014,18 +1014,18 @@ export default function ConfirmPage(): JSX.Element {
                         })}
                         autoComplete="given-name"
                         placeholder="First Name"
-                        className="arravpos-custom-input"
+                        className="aaravpos-custom-input"
                       />
                       {errors.firstName && (
-                        <p className="arravpos-error-text">
+                        <p className="aaravpos-error-text">
                           {errors.firstName.message}
                         </p>
                       )}
                     </div>
-                    <div className="arravpos-form-group">
+                    <div className="aaravpos-form-group">
                       <label
                         htmlFor="last_name"
-                        className="arravpos-form-label"
+                        className="aaravpos-form-label"
                       >
                         Last Name
                       </label>
@@ -1034,7 +1034,7 @@ export default function ConfirmPage(): JSX.Element {
                         autoComplete="family-name"
                         {...register("lastName")}
                         placeholder="Last Name"
-                        className="arravpos-custom-input"
+                        className="aaravpos-custom-input"
                       />
                     </div>
                   </div>
@@ -1085,7 +1085,7 @@ interface CardProps {
 }
 
 function Card({ children }: CardProps): JSX.Element {
-  return <div className="arravpos-card-box">{children}</div>;
+  return <div className="aaravpos-card-box">{children}</div>;
 }
 
 function Avatar({ pro }: any): JSX.Element {
@@ -1095,11 +1095,11 @@ function Avatar({ pro }: any): JSX.Element {
         <img
           src={pro.imageUrl}
           alt={pro.name}
-          className="arravpos-profile-image"
+          className="aaravpos-profile-image"
         />
       ) : (
         <div
-          className="arravpos-profile-avatar"
+          className="aaravpos-profile-avatar"
           style={{ background: pro.color ?? "#111" }}
         >
           {getUserName(pro.name)}
@@ -1114,7 +1114,7 @@ interface SectionLabelProps {
 }
 
 function SectionLabel({ children }: SectionLabelProps): JSX.Element {
-  return <p className="arravpos-section-label">{children}</p>;
+  return <p className="aaravpos-section-label">{children}</p>;
 }
 
 interface PayOptionProps {
@@ -1133,11 +1133,11 @@ function PayOption({
   return (
     <div
       onClick={onClick}
-      className={`arravpos-select-card ${selected ? "arravpos-select-card-active" : "arravpos-select-card-default"}`}
+      className={`aaravpos-select-card ${selected ? "aaravpos-select-card-active" : "aaravpos-select-card-default"}`}
     >
       <div className="aaravpos-center-items">{icon}</div>
       {label}{" "}
-      <span className="arravpos-select-check">
+      <span className="aaravpos-select-check">
         {selected && <Check size={18} />}
       </span>
     </div>

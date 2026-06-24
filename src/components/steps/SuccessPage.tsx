@@ -100,41 +100,41 @@ export default function SuccessPage(): JSX.Element {
     const remainingCount = services.length - 5;
 
     return (
-        <div className="arravpos-success-wrapper">
-            <div className="arravpos-success-motion">
-                <div className="arravpos-success-icon success-pulse">
+        <div className="aaravpos-success-wrapper">
+            <div className="aaravpos-success-motion">
+                <div className="aaravpos-success-icon success-pulse">
                     <Check />
                 </div>
-                <h1 className="arravpos-success-title">
+                <h1 className="aaravpos-success-title">
                     You're Booked!
                 </h1>
-                <p className="arravpos-success-description">
+                <p className="aaravpos-success-description">
                     Your appointment has been confirmed.
                     <br />
                     A confirmation has been sent to your email.
                 </p>
-                <div className="arravpos-success-content">
-                    <div className="arravpos-success-card">
-                        <div className="arravpos-success-row arravpos-success-row-first">
-                            <span className="arravpos-label">
+                <div className="aaravpos-success-content">
+                    <div className="aaravpos-success-card">
+                        <div className="aaravpos-success-row aaravpos-success-row-first">
+                            <span className="aaravpos-label">
                                 Outlet Name
                             </span>
-                            <span className="arravpos-value">
+                            <span className="aaravpos-value">
                                 {outlet?.outletName || "-"}
                             </span>
                         </div>
-                        <div className="arravpos-success-row">
-                            <span className="arravpos-label">
+                        <div className="aaravpos-success-row">
+                            <span className="aaravpos-label">
                                 Professional
                             </span>
-                            <span className="arravpos-value">
+                            <span className="aaravpos-value">
                                 {staff
                                     ? `${staff?.firstName} ${staff?.lastName}`
                                     : "-"}
                             </span>
                         </div>
-                        <div className="arravpos-success-row arravpos-services-header">
-                            <span className="arravpos-services-label">
+                        <div className="aaravpos-success-row aaravpos-services-header">
+                            <span className="aaravpos-services-label">
                                 Services ({services.length})
                             </span>
                             {services.length > 5 && (
@@ -142,12 +142,12 @@ export default function SuccessPage(): JSX.Element {
                                     onClick={() =>
                                         setShowAllServices((prev) => !prev)
                                     }
-                                    className="arravpos-show-btn"
+                                    className="aaravpos-show-btn"
                                 >
                                     {showAllServices ? (
                                         "Hide"
                                     ) : (
-                                        <span className="arravpos-show-btn-inner">
+                                        <span className="aaravpos-show-btn-inner">
                                             Show
                                             <ChevronDown size={16} />
                                         </span>
@@ -155,65 +155,65 @@ export default function SuccessPage(): JSX.Element {
                                 </button>
                             )}
                         </div>
-                        <div className="arravpos-services-list">
+                        <div className="aaravpos-services-list">
                             {visibleServices?.map((s) => (
                                 <div
                                     key={s.id}
-                                    className="arravpos-service-row"
+                                    className="aaravpos-service-row"
                                 >
-                                    <span className="arravpos-service-name">
+                                    <span className="aaravpos-service-name">
                                         {s.serviceName}
                                     </span>
 
-                                    <span className="arravpos-service-price">
+                                    <span className="aaravpos-service-price">
                                         <CurrencyIcon size={14} />
                                         {Number(s.price).toFixed(2)}
                                     </span>
                                 </div>
                             ))}
                             {!showAllServices && remainingCount > 0 && (
-                                <div className="arravpos-more-services">
+                                <div className="aaravpos-more-services">
                                     <Plus size={14} />
                                     {remainingCount} more services
                                 </div>
                             )}
                         </div>
-                        <div className="arravpos-success-row">
-                            <span className="arravpos-label">
+                        <div className="aaravpos-success-row">
+                            <span className="aaravpos-label">
                                 Date & Time
                             </span>
 
-                            <span className="arravpos-value">
+                            <span className="aaravpos-value">
                                 {appointment.appointmentDate} at{" "}
                                 {appointment.startTime}
                             </span>
                         </div>
-                        <div className="arravpos-success-row">
-                            <span className="arravpos-label">
+                        <div className="aaravpos-success-row">
+                            <span className="aaravpos-label">
                                 Tip
                             </span>
 
-                            <span className="arravpos-price">
+                            <span className="aaravpos-price">
                                 <CurrencyIcon size={14} />
                                 {tipAmt.toFixed(2)}
                             </span>
                         </div>
-                        <div className="arravpos-success-row">
-                            <span className="arravpos-label">
+                        <div className="aaravpos-success-row">
+                            <span className="aaravpos-label">
                                 Tax
                             </span>
 
-                            <span className="arravpos-price">
+                            <span className="aaravpos-price">
                                 <CurrencyIcon size={14} />
                                 {taxAmt.toFixed(2)}
                             </span>
                         </div>
-                        <div className="arravpos-total-row">
-                            <span className="arravpos-label">
+                        <div className="aaravpos-total-row">
+                            <span className="aaravpos-label">
                                 Total Amount
                             </span>
 
-                            <span className="arravpos-total-price">
+                            <span className="aaravpos-total-price">
                                 <CurrencyIcon size={14} />
                                 {totalWithTax}
                             </span>
@@ -221,7 +221,7 @@ export default function SuccessPage(): JSX.Element {
                     </div>
                     <button
                         onClick={handleBookAnother}
-                        className="arravpos-book-btn"
+                        className="aaravpos-book-btn"
                     >
                         <MoveLeft />
                         Book Another Appointment

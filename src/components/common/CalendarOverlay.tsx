@@ -1,12 +1,9 @@
-import { JSX, useState } from "react";
+import { JSX, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { DateTime } from "luxon";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
-
 import { setSelectedDate } from "@/slices/slotSlice";
-
 import type { OutletRootState, CalendarMonth } from "@/types";
-
 import { isDateDisabled } from "@/utils/isDateDisabled";
 
 const generateMonths = (outletTimeZone: string): CalendarMonth[] => {
@@ -14,16 +11,12 @@ const generateMonths = (outletTimeZone: string): CalendarMonth[] => {
     if (!outletTimeZone) {
       throw new Error("Missing timezone");
     }
-
     const today = DateTime.now().setZone(outletTimeZone);
-
     if (!today.isValid) {
       throw new Error("Invalid timezone");
     }
-
-    return Array.from({ length: 6 }, (_, i) => {
+    return Array.from({ length: 4 }, (_, i) => {
       const d = today.plus({ months: i }).startOf("month");
-
       return {
         label: d.toFormat("LLLL yyyy"),
         monthIdx: d.month,
@@ -34,7 +27,6 @@ const generateMonths = (outletTimeZone: string): CalendarMonth[] => {
     });
   } catch (error) {
     console.error("generateMonths error:", error);
-
     return [];
   }
 };
@@ -52,7 +44,9 @@ export default function CalendarOverlay({
 }: CalendarOverlayProps): JSX.Element | null {
   const dispatch = useDispatch();
 
-  const { selectedDate } = useSelector((state: OutletRootState) => state.booking.slots);
+  const { selectedDate } = useSelector(
+    (state: OutletRootState) => state.booking.slots,
+  );
 
   const { selectedProfessional } = useSelector(
     (state: OutletRootState) => state.booking.service,
@@ -64,13 +58,45 @@ export default function CalendarOverlay({
 
   const [months] = useState<CalendarMonth[]>(generateMonths(timeZone || ""));
 
-  const [currentMonthIndex, setCurrentMonthIndex] = useState<number>(0);
+  // open selected month directly
+  const getInitialMonthIndex = (): number => {
+    if (!selectedDate) return 0;
+
+    const index = months.findIndex(
+      (m) => m.monthIdx === selectedDate.month && m.year === selectedDate.year,
+    );
+
+    return index >= 0 ? index : 0;
+  };
+
+  const [currentMonthIndex, setCurrentMonthIndex] = useState<number>(
+    getInitialMonthIndex(),
+  );
+
+  // sync selected month when modal opens
+  useEffect(() => {
+    if (!isOpen || !selectedDate || !months.length) return;
+
+    const index = months.findIndex(
+      (m) => m.monthIdx === selectedDate.month && m.year === selectedDate.year,
+    );
+
+    if (index >= 0) {
+      setCurrentMonthIndex(index);
+    }
+  }, [isOpen, selectedDate, months]);
 
   const currentMonth = months[currentMonthIndex];
 
   if (!isOpen) return null;
 
-  const startDate = DateTime.now().setZone(timeZone ?? "UTC");
+  // normalize start date
+  const startDate = DateTime.now()
+    .setZone(timeZone ?? "UTC")
+    .startOf("day");
+
+  //allow only till next 3 months
+  const endDate = startDate.plus({ months: 3 }).minus({ days: 1 });
 
   const handlePick = (monthIdx: number, day: number): void => {
     const selectedDt = DateTime.fromObject(
@@ -91,10 +117,14 @@ export default function CalendarOverlay({
       fullDate: selectedDt.toISODate() || "",
     };
 
-    const isPastDate = selectedDt.startOf("day") < startDate.startOf("day");
+    const normalizedDate = selectedDt.startOf("day");
+
+    const isPastDate = normalizedDate < startDate;
+    const isAfterLimit = normalizedDate > endDate;
 
     const disabled =
       isPastDate ||
+      isAfterLimit ||
       isDateDisabled({
         dateObj,
         selectedProfessional,
@@ -204,10 +234,15 @@ export default function CalendarOverlay({
                 fullDate: dt.toISODate() || "",
               };
 
-              const isPastDate = dt.startOf("day") < startDate.startOf("day");
+              const normalizedDate = dt.startOf("day");
+
+              const isPastDate = normalizedDate < startDate;
+
+              const isAfterLimit = normalizedDate > endDate;
 
               const disabled =
                 // isPastDate ||
+                // isAfterLimit ||
                 isDateDisabled({
                   dateObj,
                   selectedProfessional,
@@ -233,15 +268,20 @@ export default function CalendarOverlay({
 
                     disabled && "aaravpos-calendar-day-disabled",
 
-                    isPastDate && "aaravpos-calendar-day-disabled",
+                    (isPastDate || isAfterLimit) &&
+                    "aaravpos-calendar-day-disabled",
                   ]
                     .filter(Boolean)
                     .join(" ")}
                 >
                   {/* Slash Line */}
-                  {disabled && <div className="aaravpos-calendar-day-slash" />}
+                  {disabled && (
+                    <div className="aaravpos-calendar-day-slash" />
+                  )}
 
-                  <span className="aaravpos-calendar-day-text">{day}</span>
+                  <span className="aaravpos-calendar-day-text">
+                    {day}
+                  </span>
                 </div>
               );
             })}
