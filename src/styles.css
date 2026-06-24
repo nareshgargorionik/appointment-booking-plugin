@@ -1542,8 +1542,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 12px;
-  font-size: 14px;
+  gap: 8px;
+  font-size: 13px;
   font-weight: 700;
   margin-top: 10px;
 }
