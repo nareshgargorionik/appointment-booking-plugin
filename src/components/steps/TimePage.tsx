@@ -162,17 +162,32 @@ export default function TimePage(): JSX.Element {
     );
   };
 
+  const getNextAvailableDate = () => {
+    return dates.find(
+      (d) =>
+        !isDateDisabled({
+          dateObj: d,
+          selectedProfessional,
+          outletTimeZone: timeZone || "UTC",
+        }),
+    );
+  };
+  
   useEffect(() => {
-    if (!selectedDate) {
+    if (selectedDate || !selectedProfessional) return;
+
+    const nextDate = getNextAvailableDate();
+
+    if (nextDate) {
       dispatch(
         setSelectedDate({
-          day: startDate.day,
-          month: startDate.month,
-          year: startDate.year,
+          day: nextDate.day,
+          month: nextDate.month,
+          year: nextDate.year,
         }),
       );
     }
-  }, [selectedDate, startDate, dispatch]);
+  }, [selectedDate, selectedProfessional, dates, timeZone, dispatch]);
 
   useEffect(() => {
     if (!selectedDate || !dates.length) return;
@@ -476,24 +491,16 @@ export default function TimePage(): JSX.Element {
                   .join(" ")}
               >
                 {/* Slash Line */}
-                {isDisabled && (
-                  <div className="aaravpos-date-disabled-slash" />
-                )}
+                {isDisabled && <div className="aaravpos-date-disabled-slash" />}
 
-                <span className="aaravpos-date-week">
-                  {WEEK_DAYS[dow]}
-                </span>
+                <span className="aaravpos-date-week">{WEEK_DAYS[dow]}</span>
 
                 <span className="aaravpos-date-day">{d.day}</span>
 
-                {isToday && (
-                  <span className="aaravpos-date-today">TODAY</span>
-                )}
+                {isToday && <span className="aaravpos-date-today">TODAY</span>}
 
                 {isDisabled && (
-                  <span className="aaravpos-date-unavailable">
-                    UNAVAILABLE
-                  </span>
+                  <span className="aaravpos-date-unavailable">UNAVAILABLE</span>
                 )}
               </div>
             );
@@ -571,9 +578,7 @@ export default function TimePage(): JSX.Element {
               <>
                 <SlotSection
                   label="Morning"
-                  icon={
-                    <Sunrise size={18} className="aaravpos-slot-icon" />
-                  }
+                  icon={<Sunrise size={18} className="aaravpos-slot-icon" />}
                   slots={amSlots}
                   allSlots={allSlots}
                   selectedSlotIndexes={selectedSlotIndexes}
@@ -599,9 +604,7 @@ export default function TimePage(): JSX.Element {
                 />
                 <SlotSection
                   label="Evening"
-                  icon={
-                    <Moon size={18} className="aaravpos-slot-icon" />
-                  }
+                  icon={<Moon size={18} className="aaravpos-slot-icon" />}
                   slots={evSlots}
                   allSlots={allSlots}
                   selectedSlotIndexes={selectedSlotIndexes}
@@ -666,8 +669,9 @@ function SlotSection({
         </div>
 
         <span
-          className={`aaravpos-slot-section-arrow ${isOpen ? "aaravpos-slot-section-arrow-open" : ""
-            }`}
+          className={`aaravpos-slot-section-arrow ${
+            isOpen ? "aaravpos-slot-section-arrow-open" : ""
+          }`}
         >
           <ChevronDown />
         </span>
@@ -696,12 +700,13 @@ function SlotSection({
                       handleSlotSelect(globalIndex);
                     }
                   }}
-                  className={`aaravpos-slot-card ${isDisabled
-                    ? "aaravpos-slot-card-disabled"
-                    : isSelected
-                      ? "aaravpos-slot-card-selected"
-                      : "aaravpos-slot-card-default"
-                    }`}
+                  className={`aaravpos-slot-card ${
+                    isDisabled
+                      ? "aaravpos-slot-card-disabled"
+                      : isSelected
+                        ? "aaravpos-slot-card-selected"
+                        : "aaravpos-slot-card-default"
+                  }`}
                 >
                   <span className="aaravpos-slot-time">
                     {slot.start_time_12h}
