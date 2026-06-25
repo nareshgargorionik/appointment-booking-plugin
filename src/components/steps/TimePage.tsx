@@ -94,7 +94,7 @@ export default function TimePage(): JSX.Element {
 
     return staff.filter((member) =>
       selectedServiceIds.every((serviceId) =>
-        member.assignments.some((a) => a.id === serviceId && a.assigned),
+        member?.assignments?.some((a) => a.id === serviceId && a.assigned) ?? false,
       ),
     );
   }, [staff, selectedServiceIds]);
