@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, JSX } from "react";
+import { useState, useEffect, useMemo, JSX, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { DateTime } from "luxon";
 import { toast } from "react-toastify";
@@ -29,6 +29,7 @@ import { isDateDisabled } from "@/utils/isDateDisabled";
 import OrderSidebar from "@/components/sidebar/OrderSidebar";
 import SlotSkeleton from "@/components/common/SlotSkeleton";
 import { toggleProfessional } from "@/slices/serviceSlice";
+import { useSocket } from "@/context/SocketContext";
 
 const MONTH_NAMES = [
   "Jan",
@@ -50,7 +51,7 @@ const WEEK_DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 export default function TimePage(): JSX.Element {
   const dispatch = useDispatch<AppDispatch>();
   // const { height } = useWindowSize();
-
+const { socket } = useSocket();
   const [visibleCount, setVisibleCount] = useState<number>(11);
 
   const { staff, selectedServices, selectedProfessional } = useSelector(
@@ -182,7 +183,18 @@ export default function TimePage(): JSX.Element {
     ? DateTime.fromObject(selectedDate).toFormat("yyyy-MM-dd")
     : null;
 
-  useEffect(() => {
+  // useEffect(() => {
+  //   if (!selectedProfessional?.id || !formattedDate) return;
+  //   dispatch(
+  //     getStaffSlots({
+  //       tenantId,
+  //       staffId: selectedProfessional.id,
+  //       date: formattedDate,
+  //     }),
+  //   );
+  // }, [selectedProfessional?.id, formattedDate, dispatch, tenantId]);
+
+  const fetchSlots = useCallback(() => {
     if (!selectedProfessional?.id || !formattedDate) return;
 
     dispatch(
@@ -190,9 +202,36 @@ export default function TimePage(): JSX.Element {
         tenantId,
         staffId: selectedProfessional.id,
         date: formattedDate,
-      }),
+      })
     );
-  }, [selectedProfessional?.id, formattedDate, dispatch, tenantId]);
+  }, [
+    dispatch,
+    tenantId,
+    selectedProfessional?.id,
+    formattedDate,
+  ]);
+
+  // Fetch when professional or date changes
+  useEffect(() => {
+    fetchSlots();
+  }, [fetchSlots]);
+
+  // Refetch when appointment is updated
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleAppointmentUpdated = (data: { staffId: string | number }) => {
+      if (data.staffId !== selectedProfessional?.id) return;
+
+      fetchSlots();
+    };
+
+    socket.on("appointment:updated", handleAppointmentUpdated);
+
+    return () => {
+      socket.off("appointment:updated", handleAppointmentUpdated);
+    };
+  }, [socket, selectedProfessional?.id, fetchSlots]);
 
   const handleShift = (dir: number): void => {
     setStripStart((prev) =>
@@ -485,10 +524,7 @@ export default function TimePage(): JSX.Element {
 
             const isToday = dt.hasSame(today, "day");
 
-            const isSelected =
-              selectedDate?.day === d.day &&
-              selectedDate?.month === d.month &&
-              selectedDate?.year === d.year;
+            const isSelected =   selectedDate?.day === d.day && selectedDate?.month === d.month &&  selectedDate?.year === d.year;
 
             const normalizedDate = dt.startOf("day");
 

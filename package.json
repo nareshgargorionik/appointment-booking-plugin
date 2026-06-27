@@ -1,6 +1,6 @@
 {
   "name": "@aaravpos/appointment-booking-plugin",
-  "version": "6.0.6",
+  "version": "6.0.7",
   "description": "A React component library built with Tailwind CSS v4 and TypeScript",
   "type": "module",
   "packageManager": "pnpm@10.33.0",
@@ -76,6 +76,7 @@
     "react-router-dom": "7.15.0",
     "react-signature-canvas": "1.1.0-alpha.2",
     "react-toastify": "11.1.0",
-    "redux-persist": "6.0.0"
+    "redux-persist": "6.0.0",
+    "socket.io-client": "4.8.3"
   }
 }

@@ -3,7 +3,6 @@ import { BookingPluginProvider } from "@/providers/BookingPluginProvider";
 import { BookingPluginContainer } from "./BookingPluginContainer";
 import { AppointmentBookingPluginProps, } from "@/types";
 
-
 export const AppointmentBookingPlugin: React.FC<AppointmentBookingPluginProps> = ({
     ...props
 }) => {
