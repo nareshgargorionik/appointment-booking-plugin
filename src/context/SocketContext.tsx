@@ -9,6 +9,8 @@ import { io, Socket } from "socket.io-client";
 import { useSelector } from "react-redux";
 import { RootState } from "../store"; // Update the path to your store
 
+const SOCKET_URL = 'https://prod.aaravpos.com'
+
 interface JoinStaffPayload {
   staffId: string | number;
   roomId: string | number;
@@ -35,7 +37,7 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({
   );
 
   const [socket] = useState<Socket>(() =>
-    io(import.meta.env.VITE_SOCKET_URL as string, {
+    io(SOCKET_URL as string, {
       path: "/socket.io",
       transports: ["websocket"],
       autoConnect: false,
