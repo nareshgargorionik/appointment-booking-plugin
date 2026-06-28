@@ -1,4 +1,4 @@
-import { JSX, useEffect, useState } from "react";
+import { JSX, useEffect, useState, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { DateTime } from "luxon";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
@@ -56,7 +56,11 @@ export default function CalendarOverlay({
     (state: OutletRootState) => state.booking.outletDetails,
   );
 
-  const [months] = useState<CalendarMonth[]>(generateMonths(timeZone || ""));
+  // const [months] = useState<CalendarMonth[]>(generateMonths(timeZone || ""));
+  const months = useMemo<CalendarMonth[]>(() => {
+    if (!timeZone) return [];
+    return generateMonths(timeZone);
+  }, [timeZone]);
 
   // open selected month directly
   const getInitialMonthIndex = (): number => {

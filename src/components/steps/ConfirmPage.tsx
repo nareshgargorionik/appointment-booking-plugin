@@ -14,12 +14,11 @@ import {
   checkConsentRequirement,
   submitFinalConsent,
 } from "@/services";
-import { getUserName, CurrencyIcon } from "@/utils";
+import { getUserName, CurrencyIcon, getPublicIP, calculateServiceTax } from "@/utils";
 import MainLayout from "@/components/common/MainLayout";
 import Breadcrumb from "@/components/common/Breadcrumb";
 import { nextStep } from "@/slices/breadcrumbSlice";
 import { setAppointmentId, setTips } from "@/slices/appointmentSlice";
-import { calculateServiceTax } from "@/utils";
 import type { RootState, AppDispatch } from "@/store";
 import {
   PaymentMeta,
@@ -697,6 +696,23 @@ export default function ConfirmPage(): JSX.Element {
 
   const proceedWithBooking = async (formData?: FormValues): Promise<void> => {
     const userData = formData || userDetails;
+    const ip = await getPublicIP();
+    const tracking = {
+        marketing: {
+          utmSource: "website",
+          utmMedium: "booking",
+          utmCampaign: "online-booking",
+          utmTerm: "",
+          utmContent: "cta_book_now",
+        },
+        request: {
+          ipAddress: ip,
+          userAgent: navigator.userAgent,
+          referrer: window.location.hostname,
+          landingPage: window.location.href,
+        },
+    };
+
     const payload: AppointmentPayload = {
       tenantId,
       outletId,
@@ -713,6 +729,7 @@ export default function ConfirmPage(): JSX.Element {
         email: userData?.email,
         phone: userData?.phone,
       },
+      tracking
     };
     if (servicesNeedingConsent.length && !allConsentsDone) {
       toast.warn("Please complete all consent forms first");
@@ -802,9 +819,26 @@ export default function ConfirmPage(): JSX.Element {
   //   }
   // };
   const onSubmit: SubmitHandler<FormValues> = async (data): Promise<void> => {
+    const ip = await getPublicIP();
+    const tracking = {
+        marketing: {
+          utmSource: "website",
+          utmMedium: "booking",
+          utmCampaign: "online-booking",
+          utmTerm: "",
+          utmContent: "cta_book_now",
+        },
+        request: {
+          ipAddress: ip,
+          userAgent: navigator.userAgent,
+          referrer: window.location.hostname,
+          landingPage: window.location.href,
+        },
+    };
     const payload = {
       ...data,
       phone: data?.phone ?? "",
+      tracking
     };
     if (!payType) {
       return void toast.error("Select payment method");
@@ -863,6 +897,23 @@ export default function ConfirmPage(): JSX.Element {
         return false;
       }
       const detectedCardType = getCardType(cardData.number);
+      const ip = await getPublicIP();
+      const tracking = {
+          marketing: {
+            utmSource: "website",
+            utmMedium: "booking",
+            utmCampaign: "online-booking",
+            utmTerm: "",
+            utmContent: "cta_book_now",
+          },
+          request: {
+            ipAddress: ip,
+            userAgent: navigator.userAgent,
+            referrer: window.location.hostname,
+            landingPage: window.location.href,
+          },
+      };  
+
       const paymentPayload: PaymentPayload = {
         appointmentId,
         customerId,
@@ -893,6 +944,7 @@ export default function ConfirmPage(): JSX.Element {
             email: userDetails?.email ?? "",
           },
         },
+        tracking
       };
 
       const resp = await payCustomerDirect(paymentPayload);
@@ -1139,9 +1191,9 @@ export default function ConfirmPage(): JSX.Element {
                         placeholder="Email address"
                         className="aaravpos-custom-input"
                       />
-                      {errors.firstName && (
+                      {errors.email && (
                         <p className="aaravpos-error-text">
-                          {errors.firstName.message}
+                          {errors.email.message}
                         </p>
                       )}
                     </div>

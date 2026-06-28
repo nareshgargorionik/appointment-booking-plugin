@@ -89,3 +89,17 @@ export const calculateServiceTax = (
     return total;
   }, 0);
 };
+
+export const getPublicIP = async () => {
+  try {
+    const response = await fetch("https://api.ipify.org?format=json");
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+    const data = await response.json();
+    return data.ip;
+  } catch (error) {
+    console.error("Failed to fetch public IP:", error);
+    return null;
+  }
+};

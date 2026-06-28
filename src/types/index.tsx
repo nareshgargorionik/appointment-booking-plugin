@@ -461,6 +461,26 @@ export interface CustomerInfo {
   phone?: string;
 }
 
+export interface MarketingTracking {
+  utmSource: string;
+  utmMedium: string;
+  utmCampaign: string;
+  utmTerm: string;
+  utmContent: string;
+}
+
+export interface RequestTracking {
+  ipAddress: string | null;
+  userAgent: string;
+  referrer: string;
+  landingPage: string;
+}
+
+export interface Tracking {
+  marketing: MarketingTracking;
+  request: RequestTracking;
+}
+
 export interface AppointmentPayload {
   tenantId: string | null;
   outletId: string | null;
@@ -476,6 +496,8 @@ export interface AppointmentPayload {
   requiresConsent: boolean;
 
   customer: CustomerInfo;
+
+  tracking: Tracking;
 }
 
 export interface CheckinPayload {
@@ -588,6 +610,7 @@ export interface CardData {
   cvv: string;
 }
 
+
 export interface PaymentPayload {
   appointmentId: string;
   customerId: string;
@@ -601,6 +624,7 @@ export interface PaymentPayload {
   taxAmountCents: number;
 
   transactionBody: TransactionBody;
+  tracking: Tracking;
 }
 
 export interface TransactionBody {
