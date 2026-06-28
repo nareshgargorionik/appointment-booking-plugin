@@ -700,8 +700,8 @@ export default function ConfirmPage(): JSX.Element {
     const tracking = {
         marketing: {
           utmSource: "website",
-          utmMedium: "booking",
-          utmCampaign: "online-booking",
+          utmMedium: "plugin",
+          utmCampaign: "service-plugin",
           utmTerm: "",
           utmContent: "cta_book_now",
         },
@@ -823,8 +823,8 @@ export default function ConfirmPage(): JSX.Element {
     const tracking = {
         marketing: {
           utmSource: "website",
-          utmMedium: "booking",
-          utmCampaign: "online-booking",
+          utmMedium: "plugin",
+          utmCampaign: "service-plugin",
           utmTerm: "",
           utmContent: "cta_book_now",
         },
@@ -901,8 +901,8 @@ export default function ConfirmPage(): JSX.Element {
       const tracking = {
           marketing: {
             utmSource: "website",
-            utmMedium: "booking",
-            utmCampaign: "online-booking",
+            utmMedium: "plugin",
+            utmCampaign: "service-plugin",
             utmTerm: "",
             utmContent: "cta_book_now",
           },

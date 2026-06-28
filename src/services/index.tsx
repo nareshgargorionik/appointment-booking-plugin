@@ -1,7 +1,9 @@
 import { store } from "@/store";
 import { ConsentCheckStatus, ConsentFormResponse, PaymentPayload, Service, SignatureType, SubmitFinalConsentPayload } from "@/types";
 
-const BASE_URL = "https://prod.aaravpos.com/api/v1";
+// const BASE_URL = "https://prod.aaravpos.com/api/v1";
+
+const BASE_URL = 'https://backendv1.aaravpos.in/api/v1';
 
 export const getHeaders = () => {
     const token = store.getState()?.booking.outletDetails?.token;
