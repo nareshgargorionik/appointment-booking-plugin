@@ -5,7 +5,6 @@ import {
   Scissors,
   User,
   Clock3,
-  // Info,
   CheckCircle2,
   ShoppingCart
 } from "lucide-react";
