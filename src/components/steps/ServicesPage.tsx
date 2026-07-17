@@ -1,20 +1,17 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Search, Minus, Plus, X, ChevronRight } from "lucide-react";
+import { Search, X } from "lucide-react";
 import {
-  toggleService,
-  incrementService,
-  decrementService,
+  toggleService
 } from "@/slices/serviceSlice";
 import Breadcrumb from "@/components/common/Breadcrumb";
 import MainLayout from "@/components/common/MainLayout";
-import ServiceSidebar from "@/components/sidebar/ServiceSidebar";
 import ServiceSkeletonCard from "@/components/common/ServiceSkeleton";
 import { isConsentRequiredService } from "@/services";
 import { nextStep } from "@/slices/breadcrumbSlice";
 import { CurrencyIcon } from "@/utils";
-import { OutletRootState, Service, ServiceItem, TaxRow } from "@/types";
-import { setSidebarOpen } from "@/slices/themeSlice";
+import { OutletRootState, Service, TaxRow } from "@/types";
+import ServiceSidebarSkeleton from "../common/ServiceSidebarSkeleton";
 
 export default function ServicesPage() {
   const dispatch = useDispatch();
@@ -68,11 +65,6 @@ export default function ServicesPage() {
     return svc.taxRows?.some((tax: TaxRow) => tax.isActive) || false;
   };
 
-  const totalPrice = selectedServices.reduce((sum: number, s: ServiceItem) => {
-    const price = Number(s.price || s.min_price || 0);
-    return sum + price * s.qty;
-  }, 0);
-
   useEffect(() => {
     if (!superCategories?.length) return;
     const firstSuperCategory = superCategories.find((superCat: any) =>
@@ -87,25 +79,26 @@ export default function ServicesPage() {
   return (
     <MainLayout
       sidebar={
-        <ServiceSidebar
-          selectedServices={selectedServices}
-          totalPrice={totalPrice}
-          goToStep={() => dispatch(nextStep())}
-        />
+        <ServiceSidebarSkeleton />
+        // <ServiceSidebar
+        //   selectedServices={selectedServices}
+        //   totalPrice={totalPrice}
+        //   goToStep={() => dispatch(nextStep())}
+        // />
       }
-      renderButton={
-        servicesToShow?.length > 0 ? (
-          <button
-            onClick={() => dispatch(nextStep())}
-            disabled={!selectedServices.length}
-            className="aaravpos-btn"
-          >
-            <span className="aaravpos-btn-content">
-              Choose Professional <ChevronRight size={16} />
-            </span>
-          </button>
-        ) : null
-      }
+    // renderButton={
+    //   servicesToShow?.length > 0 ? (
+    //     <button
+    //       onClick={() => dispatch(nextStep())}
+    //       disabled={!selectedServices.length}
+    //       className="aaravpos-btn"
+    //     >
+    //       <span className="aaravpos-btn-content">
+    //         Choose Professional <ChevronRight size={16} />
+    //       </span>
+    //     </button>
+    //   ) : null
+    // }
     >
       <Breadcrumb />
       <div className="aaravpos-margin-top-20">
@@ -237,17 +230,19 @@ export default function ServicesPage() {
                       <div
                         key={index}
                         onClick={() => {
-                          const exists = selectedServices.find(
-                            (s: any) => s.id === svc.id,
-                          );
-                          if (exists && exists.qty === 1) {
-                            dispatch(decrementService(String(svc.id)));
-                          } else {
-                            dispatch(toggleService(svc));
-                          }
-                          if (window.innerWidth > 991) {
-                            dispatch(setSidebarOpen(true))
-                          }
+                          dispatch(toggleService(svc));
+                          dispatch(nextStep());
+                          // const exists = selectedServices.find(
+                          //   (s: any) => s.id === svc.id,
+                          // );
+                          // if (exists && exists.qty === 1) {
+                          //   dispatch(decrementService(String(svc.id)));
+                          // } else {
+                          //   dispatch(toggleService(svc));
+                          // }
+                          // if (window.innerWidth > 991) {
+                          //   dispatch(setSidebarOpen(true))
+                          // }
                         }}
                         className={`aaravpos-service-card ${isSelected ? "active" : ""}`}
                       >
@@ -264,16 +259,16 @@ export default function ServicesPage() {
                         {/* NAME */}
                         <p className="aaravpos-service-title">{svc.name}</p>
                         {/* DESCRIPTION */}
-                        <div className="aaravpos-service-description-wrapper">
-                          <p className="aaravpos-service-description">
-                            {svc.description}
-                          </p>
-                          {svc.description && svc.description.length > 30 && (
+                        {/* <div className="aaravpos-service-description-wrapper"> */}
+                        <p className="aaravpos-service-description">
+                          {svc.description}
+                        </p>
+                        {/* {svc.description && svc.description.length > 30 && (
                             <div className="aaravpos-service-tooltip">
                               {svc.description}
                             </div>
-                          )}
-                        </div>
+                          )} */}
+                        {/* </div> */}
                         {/* PRICE */}
                         <p className="aaravpos-service-price">
                           <span>
@@ -284,53 +279,18 @@ export default function ServicesPage() {
                           <span className="aaravpos-service-price-right">
                             {svc.price ? (
                               <>
-                                <CurrencyIcon size={14} />
+                                <CurrencyIcon className="aaravpos-currency-icon" />
                                 {svc.price}
                               </>
                             ) : (
                               <>
-                                <CurrencyIcon size={14} />
-                                {svc.min_price} - <CurrencyIcon size={14} />
+                                <CurrencyIcon className="aaravpos-currency-icon" />
+                                {svc.min_price} - <CurrencyIcon className="aaravpos-currency-icon" />
                                 {svc.max_price}
                               </>
                             )}
                           </span>
                         </p>
-                        {/* ACTIONS */}
-                        <div className="aaravpos-service-actions">
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              dispatch(decrementService(String(svc.id)));
-                              if (window.innerWidth > 991) {
-                                dispatch(setSidebarOpen(true))
-                              }
-                            }}
-                            className="aaravpos-service-action-btn"
-                          >
-                            <Minus size={14} />
-                          </button>
-                          <span className="aaravpos-service-qty">
-                            {selectedServices.find((s: any) => s.id === svc.id)?.qty || 0}
-                          </span>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              const exists = selectedServices.find((s: any) => s.id === svc.id);
-                              if (!exists) {
-                                dispatch(toggleService(svc));
-                              } else {
-                                dispatch(incrementService(String(svc.id)));
-                              }
-                              if (window.innerWidth > 991) {
-                                dispatch(setSidebarOpen(true))
-                              }
-                            }}
-                            className="aaravpos-service-action-btn plus"
-                          >
-                            <Plus size={14} />
-                          </button>
-                        </div>
                       </div>
                     );
                   })

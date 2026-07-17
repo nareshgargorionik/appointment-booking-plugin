@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
-import { ChevronRight, Clock3, X, Package2 } from "lucide-react";
+import { ChevronRight, Clock3, X } from "lucide-react";
 import { CurrencyIcon, getUserName } from "@/utils";
 import { Staff, Step, Service, OutletRootState } from "@/types";
 import type { AppDispatch } from "@/store";
@@ -102,8 +102,6 @@ const ProfessionalSidebar = ({
                     </div>
                     <div className="aaravpos-order-details">
                       <div className="aaravpos-order-detail">
-                        <Package2 size={13} />
-                        <span>{svc.qty}</span>
                       </div>
                       {/* Duration */}
                       <div className="aaravpos-order-detail center">
@@ -131,8 +129,6 @@ const ProfessionalSidebar = ({
                     </div>
                     <div className="aaravpos-order-details">
                       <div className="aaravpos-order-detail">
-                        <Package2 size={13} />
-                        <span>{svc.qty}</span>
                       </div>
                       <div className="aaravpos-order-detail center">
                         <Clock3 size={13} />

@@ -13,8 +13,8 @@ const currencyIcons: Record<Currency, React.ElementType> = {
 
 type Props = {
   size?: number;
+  className?: string;
 };
-
 type TaxType = "FIXED" | "PERCENTAGE";
 
 type TaxRow = {
@@ -34,7 +34,7 @@ type CalculateServiceTaxOptions = {
   perUnit?: boolean;
 };
 
-export const CurrencyIcon = ({ size = 20 }: Props) => {
+export const CurrencyIcon = ({ size = 20, className }: Props) => {
   const currency = useSelector(
     (state: RootState) => state.booking.outletDetails?.currency
   ) as Currency | undefined;
@@ -43,7 +43,7 @@ export const CurrencyIcon = ({ size = 20 }: Props) => {
     ? currencyIcons[currency]
     : DollarSign;
 
-  return <Icon size={size} />;
+  return <Icon size={size} className={`aaravpos-currency-icon ${className || ""}`.trim()} />;
 };
 
 
