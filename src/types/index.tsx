@@ -131,6 +131,7 @@ export interface ServiceState {
   selectedCategory: Category | null;
   selectedServices: ServiceItem[];
   selectedProfessional: Staff | null;
+  loading: boolean;
 }
 
 export interface Service {

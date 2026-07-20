@@ -168,7 +168,6 @@
 .aaravpos-tab-disabled {
   cursor: not-allowed;
   opacity: 0.5;
-  pointer-events: none;
 }
 
 .aaravpos-container {
@@ -736,7 +735,6 @@
 .aaravpos-step-btn.disabled {
   cursor: not-allowed;
   opacity: 0.5;
-  pointer-events: none;
 }
 
 .aaravpos-step-btn.active {
@@ -1397,10 +1395,9 @@
 
 .aaravpos-order-details {
   width: 100%;
-  display: grid;
-  gap: 4px;
-  grid-template-columns: repeat(3, 1fr);
+  display: flex;
   align-items: center;
+  justify-content: space-between;
   margin-top: 4px;
 }
 
@@ -4322,7 +4319,6 @@
   /* border-gray-200 */
   cursor: not-allowed;
   /* cursor-not-allowed */
-  pointer-events: none;
 }
 
 .booking-pro-avatar-circle {

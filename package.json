@@ -1,6 +1,6 @@
 {
   "name": "@aaravpos/appointment-booking-plugin",
-  "version": "6.0.9",
+  "version": "7.0.0",
   "description": "A React component library built with Tailwind CSS v4 and TypeScript",
   "type": "module",
   "packageManager": "pnpm@10.33.0",

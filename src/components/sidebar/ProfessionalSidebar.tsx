@@ -95,19 +95,14 @@ const ProfessionalSidebar = ({
                     key={svc.id}
                     className="aaravpos-order-item"
                   >
-                    <div className="aaravpos-main-text">
-                      <p className="aaravpos-order-service-name">
-                        {svc.name}
-                      </p>
-                    </div>
+                    <p className="aaravpos-order-service-name">
+                      {svc.name}
+                    </p>
                     <div className="aaravpos-order-details">
-                      <div className="aaravpos-order-detail">
-                      </div>
-                      {/* Duration */}
-                      <div className="aaravpos-order-detail center">
+                      <p className="aaravpos-order-detail center">
                         <Clock3 size={13} />
                         <span>{svc.min_time || svc.estimated_time} min</span>
-                      </div>
+                      </p>
                       <p className="aaravpos-order-detail right">
                         <CurrencyIcon size={12} />
                         {svc.price || svc.min_price}

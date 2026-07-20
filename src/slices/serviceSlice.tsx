@@ -7,6 +7,7 @@ const initialState: ServiceState = {
   selectedCategory: null,
   selectedServices: [],
   selectedProfessional: null,
+  loading: true,
 };
 
 const serviceSlice = createSlice({
@@ -22,6 +23,10 @@ const serviceSlice = createSlice({
     ) => {
       state.superCategories = action.payload.superCategories;
       state.staff = action.payload.staff;
+      state.loading = false;
+    },
+    setServiceLoading: (state, action: PayloadAction<boolean>) => {
+      state.loading = action.payload;
     },
     setCategory: (state, action: PayloadAction<Category | null>) => {
       state.selectedCategory = action.payload;
@@ -71,6 +76,7 @@ const serviceSlice = createSlice({
 
 export const {
   setServicePayload,
+  setServiceLoading,
   setCategory,
   toggleService,
   toggleAdditionalService,

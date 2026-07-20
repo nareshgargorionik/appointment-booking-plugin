@@ -83,6 +83,14 @@ const allowedCountries: CountryCode[] = [
   "AU",
   "CN",
 ] as const;
+
+const isPhoneEmptyOrOnlyCallingCode = (value?: string): boolean => {
+  if (!value) return true;
+  const digitsOnly = value.replace(/\D/g, "");
+  const allowedCodes = ["91", "1", "63", "64", "61", "86"];
+  return allowedCodes.includes(digitsOnly) || digitsOnly.length === 0;
+};
+
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 const expiryToNumber = (exp: string): number => {
@@ -183,6 +191,11 @@ export default function ConfirmPage(): JSX.Element {
 
   const phoneValue = watch("phone");
   const emailValue = watch("email");
+
+  const isPhoneValid = phoneValue ? isValidPhoneNumber(phoneValue) : false;
+  const isEmailValid = emailValue ? /^\S+@\S+\.\S+$/.test(emailValue) : false;
+  const showPhoneAsterisk = !isEmailValid || isPhoneValid;
+  const showEmailAsterisk = !isPhoneValid || isEmailValid;
 
   const normalizePhone = (phone?: string): string =>
     phone?.replace(/\s+/g, "") || "";
@@ -858,9 +871,10 @@ export default function ConfirmPage(): JSX.Element {
   const onFormSubmit: SubmitHandler<FormValues> = async (
     data,
   ): Promise<void> => {
+    const phone = isPhoneEmptyOrOnlyCallingCode(data.phone) ? "" : (data.phone ?? "");
     const payload = {
       ...data,
-      phone: data?.phone ?? "",
+      phone,
     };
     if (!payType) {
       return void toast.error("Select payment method");
@@ -1102,8 +1116,7 @@ export default function ConfirmPage(): JSX.Element {
                   <div className="aaravpos-details-grid">
                     <div className="aaravpos-form-group">
                       <label className="aaravpos-form-label" htmlFor="phone">
-                        Phone{" "}
-                        {!emailValue && (
+                        Phone {showPhoneAsterisk && (
                           <span className="aaravpos-required">*</span>
                         )}
                       </label>
@@ -1112,8 +1125,8 @@ export default function ConfirmPage(): JSX.Element {
                         name="phone"
                         rules={{
                           validate: (value) => {
-                            const hasPhone = !!normalizePhone(value);
-                            const hasEmail = !!emailValue?.trim();
+                            const hasPhone = !isPhoneEmptyOrOnlyCallingCode(value);
+                            const hasEmail = emailValue && /^\S+@\S+\.\S+$/.test(emailValue);
                             if (!hasPhone && !hasEmail) {
                               return "Enter phone or email";
                             }
@@ -1170,8 +1183,7 @@ export default function ConfirmPage(): JSX.Element {
                     </div>
                     <div className="aaravpos-form-group">
                       <label htmlFor="email" className="aaravpos-form-label">
-                        Email{" "}
-                        {!phoneValue && (
+                        Email {showEmailAsterisk && (
                           <span className="aaravpos-required">*</span>
                         )}
                       </label>
@@ -1180,7 +1192,7 @@ export default function ConfirmPage(): JSX.Element {
                         {...register("email", {
                           validate: (value) => {
                             const hasEmail = !!value?.trim();
-                            const hasPhone = !!normalizePhone(phoneValue);
+                            const hasPhone = !isPhoneEmptyOrOnlyCallingCode(phoneValue);
                             if (!hasEmail && !hasPhone) {
                               return "Enter phone or email";
                             }
@@ -1356,8 +1368,7 @@ export default function ConfirmPage(): JSX.Element {
                               className="booking-confirm-field-label"
                               htmlFor="phone"
                             >
-                              Phone{" "}
-                              {!emailValue && (
+                              Phone {showPhoneAsterisk && (
                                 <span className="booking-confirm-field-required">*</span>
                               )}
                             </label>
@@ -1366,9 +1377,8 @@ export default function ConfirmPage(): JSX.Element {
                               name="phone"
                               rules={{
                                 validate: (value) => {
-                                  const phone = normalizePhone(value);
-                                  const hasPhone = !!phone;
-                                  const hasEmail = !!emailValue?.trim();
+                                  const hasPhone = !isPhoneEmptyOrOnlyCallingCode(value);
+                                  const hasEmail = emailValue && /^\S+@\S+\.\S+$/.test(emailValue);
                                   if (!hasPhone && !hasEmail) {
                                     return "Enter phone or email";
                                   }
@@ -1427,8 +1437,7 @@ export default function ConfirmPage(): JSX.Element {
                               className="booking-confirm-field-label"
                               htmlFor="email"
                             >
-                              Email{" "}
-                              {!phoneValue && (
+                              Email {showEmailAsterisk && (
                                 <span className="booking-confirm-field-required">*</span>
                               )}
                             </label>
@@ -1448,7 +1457,7 @@ export default function ConfirmPage(): JSX.Element {
                                   },
                                   validate: (value) => {
                                     const hasEmail = !!value?.trim();
-                                    const hasPhone = !!normalizePhone(phoneValue);
+                                    const hasPhone = !isPhoneEmptyOrOnlyCallingCode(phoneValue);
                                     if (!hasEmail && !hasPhone)
                                       return "Enter phone or email";
                                     if (

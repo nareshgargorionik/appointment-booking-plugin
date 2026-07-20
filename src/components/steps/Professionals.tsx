@@ -227,7 +227,7 @@ export default function Professionals() {
             ) : (
               staff?.map((p: any) => {
                 const { isOnLeave, availableFrom } = getLeaveInfo(p);
-                const isDisabled = isProfessionalDisabled(p);
+                const isDisabled = isProfessionalDisabled(p) || isOnLeave || availableFrom;
                 const isSelected = selectedProfessional?.id === p.id;
 
                 return (
@@ -270,14 +270,14 @@ export default function Professionals() {
                     </div>
 
                     {/* Leave Message */}
-                    {isOnLeave && availableFrom && (
+                    {/* {isOnLeave && availableFrom && (
                       <div className="booking-pro-leave">
                         <span className="booking-pro-leave-dot" />
                         <p className="booking-pro-leave-text">
                           Available from {availableFrom}
                         </p>
                       </div>
-                    )}
+                    )} */}
                   </div>
                 );
               })

@@ -15,6 +15,13 @@ import { FormValues, FetchCustomerResponse, OutletRootState } from "@/types";
 
 const allowedCountries: CountryCode[] = ["IN", "US", "CA", "PH", "NZ", "AU", "CN"] as const;
 
+const isPhoneEmptyOrOnlyCallingCode = (value?: string): boolean => {
+    if (!value) return true;
+    const digitsOnly = value.replace(/\D/g, "");
+    const allowedCodes = ["91", "1", "63", "64", "61", "86"];
+    return allowedCodes.includes(digitsOnly) || digitsOnly.length === 0;
+};
+
 // -------------------- Component --------------------
 export default function DetailsPage(): JSX.Element {
     const dispatch = useDispatch();
@@ -59,6 +66,11 @@ export default function DetailsPage(): JSX.Element {
     const phoneValue = watch("phone");
     const emailValue = watch("email");
 
+    const isPhoneValid = phoneValue ? isValidPhoneNumber(phoneValue) : false;
+    const isEmailValid = emailValue ? /^\S+@\S+\.\S+$/.test(emailValue) : false;
+    const showPhoneAsterisk = !isEmailValid || isPhoneValid;
+    const showEmailAsterisk = !isPhoneValid || isEmailValid;
+
     useEffect(() => {
         reset({ ...userDetails, phone: userDetails?.phone || "", }, { keepErrors: true, keepDirty: false });
     }, [userDetails, reset]);
@@ -74,7 +86,8 @@ export default function DetailsPage(): JSX.Element {
     const isValidEmail = (email: string): boolean => /^\S+@\S+\.\S+$/.test(email);
 
     const onSubmit: SubmitHandler<FormValues> = (data): void => {
-        const payload = { ...data, phone: data?.phone ?? "", };
+        const phone = isPhoneEmptyOrOnlyCallingCode(data.phone) ? "" : (data.phone ?? "");
+        const payload = { ...data, phone };
         dispatch(setUserDetails(payload));
         dispatch(nextStep());
     };
@@ -190,15 +203,15 @@ export default function DetailsPage(): JSX.Element {
                         <div className="aaravpos-details-grid">
                             <div className="aaravpos-form-group">
                                 <label className="aaravpos-form-label" htmlFor="phone">
-                                    Phone {!emailValue && (<span className="aaravpos-required">*</span>)}
+                                    Phone {showPhoneAsterisk && (<span className="aaravpos-required">*</span>)}
                                 </label>
                                 <Controller
                                     control={control}
                                     name="phone"
                                     rules={{
                                         validate: (value) => {
-                                            const hasPhone = !!normalizePhone(value);
-                                            const hasEmail = !!emailValue?.trim();
+                                            const hasPhone = !isPhoneEmptyOrOnlyCallingCode(value);
+                                            const hasEmail = emailValue && /^\S+@\S+\.\S+$/.test(emailValue);
                                             if (!hasPhone && !hasEmail) {
                                                 return "Enter phone or email";
                                             }
@@ -245,14 +258,14 @@ export default function DetailsPage(): JSX.Element {
                             </div>
                             <div className="aaravpos-form-group">
                                 <label htmlFor="email" className="aaravpos-form-label">
-                                    Email {!phoneValue && (<span className="aaravpos-required">*</span>)}
+                                    Email {showEmailAsterisk && (<span className="aaravpos-required">*</span>)}
                                 </label>
                                 <input
                                     id="email"
                                     {...register("email", {
                                         validate: (value) => {
                                             const hasEmail = !!value?.trim();
-                                            const hasPhone = !!normalizePhone(phoneValue);
+                                            const hasPhone = !isPhoneEmptyOrOnlyCallingCode(phoneValue);
                                             if (!hasEmail && !hasPhone) {
                                                 return "Enter phone or email";
                                             }
@@ -269,9 +282,9 @@ export default function DetailsPage(): JSX.Element {
                                     placeholder="Email address"
                                     className="aaravpos-custom-input"
                                 />
-                                {errors.firstName && (
+                                {errors.email && (
                                     <p className="aaravpos-error-text">
-                                        {errors.firstName.message}
+                                        {errors.email?.message}
                                     </p>
                                 )}
                             </div>

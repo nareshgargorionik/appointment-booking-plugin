@@ -275,10 +275,6 @@ export default function OrderSidebar({
                 <p className="aaravpos-order-service-name">{svc.name}</p>
               </div>
               <div className="aaravpos-order-details">
-                <div className="aaravpos-order-detail">
-                  <Package2 size={13} />
-                  <span>{svc.qty}</span>
-                </div>
                 {/* Duration */}
                 <div className="aaravpos-order-detail center">
                   <Clock3 size={13} />
