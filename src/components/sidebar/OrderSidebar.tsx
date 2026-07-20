@@ -1,7 +1,7 @@
 import { useMemo, useRef, useState, useEffect, ReactNode, JSX } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { DateTime } from "luxon";
-import { X, MoveRight, Clock3, Package2 } from "lucide-react";
+import { X, MoveRight, Clock3 } from "lucide-react";
 import { CurrencyIcon, getUserName } from "@/utils";
 import { calculateServiceTax } from "@/utils/taxHelper";
 import type { OutletRootState, ServiceItem, StaffMember, Slot } from "@/types";
