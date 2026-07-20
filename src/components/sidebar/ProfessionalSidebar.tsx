@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
-import { ChevronRight, Clock3, X, Package2 } from "lucide-react";
+import { ChevronRight, Clock3, X } from "lucide-react";
 import { CurrencyIcon, getUserName } from "@/utils";
 import { Staff, Step, Service, OutletRootState } from "@/types";
 import type { AppDispatch } from "@/store";
@@ -95,21 +95,14 @@ const ProfessionalSidebar = ({
                     key={svc.id}
                     className="aaravpos-order-item"
                   >
-                    <div className="aaravpos-main-text">
-                      <p className="aaravpos-order-service-name">
-                        {svc.name}
-                      </p>
-                    </div>
+                    <p className="aaravpos-order-service-name">
+                      {svc.name}
+                    </p>
                     <div className="aaravpos-order-details">
-                      <div className="aaravpos-order-detail">
-                        <Package2 size={13} />
-                        <span>{svc.qty}</span>
-                      </div>
-                      {/* Duration */}
-                      <div className="aaravpos-order-detail center">
+                      <p className="aaravpos-order-detail center">
                         <Clock3 size={13} />
                         <span>{svc.min_time || svc.estimated_time} min</span>
-                      </div>
+                      </p>
                       <p className="aaravpos-order-detail right">
                         <CurrencyIcon size={12} />
                         {svc.price || svc.min_price}
@@ -131,8 +124,6 @@ const ProfessionalSidebar = ({
                     </div>
                     <div className="aaravpos-order-details">
                       <div className="aaravpos-order-detail">
-                        <Package2 size={13} />
-                        <span>{svc.qty}</span>
                       </div>
                       <div className="aaravpos-order-detail center">
                         <Clock3 size={13} />

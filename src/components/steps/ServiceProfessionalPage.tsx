@@ -1,10 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Search, Minus, Plus, X, ChevronRight } from "lucide-react";
+import { Search, X, ChevronRight } from "lucide-react";
 import {
   toggleService,
-  incrementService,
-  decrementService,
 } from "@/slices/serviceSlice";
 import Breadcrumb from "@/components/common/Breadcrumb";
 import MainLayout from "@/components/common/MainLayout";
@@ -15,7 +13,6 @@ import { isConsentRequiredService } from "@/services";
 import { CurrencyIcon } from "@/utils";
 import type { AppDispatch } from "@/store";
 import type { Service, ServiceItem, TaxRow, StaffAssignment } from "@/types";
-import { setSidebarOpen } from "@/slices/themeSlice";
 
 export default function ServiceProfessionalPage() {
   const dispatch = useDispatch<AppDispatch>();
@@ -249,24 +246,25 @@ export default function ServiceProfessionalPage() {
                       <div
                         key={index}
                         onClick={() => {
-                          const exists = selectedServices.find(
-                            (s: any) => s.id === svc.id,
-                          );
-                          if (exists && exists.qty === 1) {
-                            dispatch(decrementService(String(svc.id)));
-                          } else {
-                            dispatch(
-                              toggleService({
-                                ...svc,
-                                price: svc.price
-                                  ? Number(svc.price)
-                                  : undefined,
-                              }),
-                            );
-                          }
-                          if (window.innerWidth > 991) {
-                            dispatch(setSidebarOpen(true))
-                          }
+                          dispatch(toggleService(svc));
+                          // const exists = selectedServices.find(
+                          //   (s: any) => s.id === svc.id,
+                          // );
+                          // if (exists && exists.qty === 1) {
+                          //   dispatch(decrementService(String(svc.id)));
+                          // } else {
+                          //   dispatch(
+                          //     toggleService({
+                          //       ...svc,
+                          //       price: svc.price
+                          //         ? Number(svc.price)
+                          //         : undefined,
+                          //     }),
+                          //   );
+                          // }
+                          // if (window.innerWidth > 991) {
+                          //   dispatch(setSidebarOpen(true))
+                          // }
                         }}
                         className={`aaravpos-service-card ${isSelected ? "active" : ""}`}
                       >
@@ -283,11 +281,11 @@ export default function ServiceProfessionalPage() {
                           <p className="aaravpos-service-description">
                             {svc.description}
                           </p>
-                          {svc.description && svc.description.length > 30 && (
+                          {/* {svc.description && svc.description.length > 30 && (
                             <div className="aaravpos-service-tooltip">
                               {svc.description}
                             </div>
-                          )}
+                          )} */}
                         </div>
                         <p className="aaravpos-service-price">
                           <span>
@@ -296,16 +294,16 @@ export default function ServiceProfessionalPage() {
                           <span className="aaravpos-service-price-right">
                             {svc.price ? (
                               <>
-                                <CurrencyIcon size={14} /> {svc.price}
+                                <CurrencyIcon className="aaravpos-currency-icon" /> {svc.price}
                               </>
                             ) : (
                               <>
-                                <CurrencyIcon size={14} /> {svc.min_price} - <CurrencyIcon size={14} /> {svc.max_price}
+                                <CurrencyIcon className="aaravpos-currency-icon" /> {svc.min_price} - <CurrencyIcon className="aaravpos-currency-icon" /> {svc.max_price}
                               </>
                             )}
                           </span>
                         </p>
-                        <div className="aaravpos-service-actions">
+                        {/* <div className="aaravpos-service-actions">
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
@@ -347,7 +345,7 @@ export default function ServiceProfessionalPage() {
                           >
                             <Plus size={14} />
                           </button>
-                        </div>
+                        </div> */}
                       </div>
                     );
                   })

@@ -40,7 +40,7 @@ interface OrderSidebarProps {
   totalConsents?: number;
   checkingConsent?: boolean;
   loading?: boolean;
-  // isBookingDisabled?: boolean;
+  isBookingDisabled?: boolean;
 }
 
 export default function OrderSidebar({
@@ -55,7 +55,7 @@ export default function OrderSidebar({
   totalConsents = 0,
   checkingConsent = false,
   loading = false,
-  // isBookingDisabled = false,
+  isBookingDisabled = false,
 }: OrderSidebarProps): JSX.Element {
   const dispatch = useDispatch<AppDispatch>();
 
@@ -174,7 +174,7 @@ export default function OrderSidebar({
     buttonText,
   ]);
 
-  // const isButtonDisabled = isBookingDisabled || loading || checkingConsent || !timeRange;
+  const isButtonDisabled = isBookingDisabled || loading || checkingConsent || !timeRange;
 
   useEffect(() => {
     const calculateHeight = (): void => {
@@ -275,10 +275,6 @@ export default function OrderSidebar({
                 <p className="aaravpos-order-service-name">{svc.name}</p>
               </div>
               <div className="aaravpos-order-details">
-                <div className="aaravpos-order-detail">
-                  <Package2 size={13} />
-                  <span>{svc.qty}</span>
-                </div>
                 {/* Duration */}
                 <div className="aaravpos-order-detail center">
                   <Clock3 size={13} />
@@ -322,11 +318,10 @@ export default function OrderSidebar({
                       }
                     }}
                     className={`aaravpos-tip-btn  
-                        ${
-                          isFirst || isLast
-                            ? "aaravpos-tip-btn-fixed"
-                            : "aaravpos-tip-btn-flex"
-                        } ${isActive ? "aaravpos-tip-btn-active" : ""}`}
+                        ${isFirst || isLast
+                        ? "aaravpos-tip-btn-fixed"
+                        : "aaravpos-tip-btn-flex"
+                      } ${isActive ? "aaravpos-tip-btn-active" : ""}`}
                   >
                     {isCustom ? "Custom" : item === 0 ? "No tip" : `${item}%`}
                   </button>
@@ -414,7 +409,7 @@ export default function OrderSidebar({
           </div>
           <button
             onClick={onButtonClick}
-            // disabled={isButtonDisabled}
+            disabled={isButtonDisabled}
             className="aaravpos-common-btn aaravpos-padding-btn"
             style={{ height: 42 }}
           >

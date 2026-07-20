@@ -51,7 +51,7 @@ const WEEK_DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 export default function TimePage(): JSX.Element {
   const dispatch = useDispatch<AppDispatch>();
   // const { height } = useWindowSize();
-const { socket } = useSocket();
+  const { socket } = useSocket();
   const [visibleCount, setVisibleCount] = useState<number>(11);
 
   const { staff, selectedServices, selectedProfessional } = useSelector(
@@ -524,7 +524,7 @@ const { socket } = useSocket();
 
             const isToday = dt.hasSame(today, "day");
 
-            const isSelected =   selectedDate?.day === d.day && selectedDate?.month === d.month &&  selectedDate?.year === d.year;
+            const isSelected = selectedDate?.day === d.day && selectedDate?.month === d.month && selectedDate?.year === d.year;
 
             const normalizedDate = dt.startOf("day");
 
@@ -620,8 +620,7 @@ const { socket } = useSocket();
             </p>
 
             <p className="aaravpos-selected-professional-services">
-              {selectedStaffServices.map((s: any) => s.name).join(", ")} ·{" "}
-              {totalDuration} min
+              {selectedProfessional?.staff_type}
             </p>
           </div>
         </div>
@@ -751,9 +750,8 @@ function SlotSection({
         </div>
 
         <span
-          className={`aaravpos-slot-section-arrow ${
-            isOpen ? "aaravpos-slot-section-arrow-open" : ""
-          }`}
+          className={`aaravpos-slot-section-arrow ${isOpen ? "aaravpos-slot-section-arrow-open" : ""
+            }`}
         >
           <ChevronDown />
         </span>
@@ -782,13 +780,12 @@ function SlotSection({
                       handleSlotSelect(globalIndex);
                     }
                   }}
-                  className={`aaravpos-slot-card ${
-                    isDisabled
-                      ? "aaravpos-slot-card-disabled"
-                      : isSelected
-                        ? "aaravpos-slot-card-selected"
-                        : "aaravpos-slot-card-default"
-                  }`}
+                  className={`aaravpos-slot-card ${isDisabled
+                    ? "aaravpos-slot-card-disabled"
+                    : isSelected
+                      ? "aaravpos-slot-card-selected"
+                      : "aaravpos-slot-card-default"
+                    }`}
                 >
                   <span className="aaravpos-slot-time">
                     {slot.start_time_12h}
@@ -836,9 +833,8 @@ function ProfessionalDropdown({
 
         <ChevronDown
           size={18}
-          className={`aaravpos-professional-dropdown-icon ${
-            open ? "aaravpos-professional-dropdown-icon-open" : ""
-          }`}
+          className={`aaravpos-professional-dropdown-icon ${open ? "aaravpos-professional-dropdown-icon-open" : ""
+            }`}
         />
       </button>
 
@@ -853,11 +849,10 @@ function ProfessionalDropdown({
                   onSelect(pro);
                   setOpen(false);
                 }}
-                className={`aaravpos-professional-dropdown-item ${
-                  index !== filteredProfessionals.length - 1
-                    ? "aaravpos-professional-dropdown-item-border"
-                    : ""
-                }`}
+                className={`aaravpos-professional-dropdown-item ${index !== filteredProfessionals.length - 1
+                  ? "aaravpos-professional-dropdown-item-border"
+                  : ""
+                  }`}
               >
                 {pro.imageUrl ? (
                   <img

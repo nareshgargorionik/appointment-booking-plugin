@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, useRef, JSX, useCallback } from "react";
 import { toast } from "react-toastify";
 import { DateTime } from "luxon";
 import { useSelector, useDispatch } from "react-redux";
-import { Check, CalendarDays, Store } from "lucide-react";
+import { Check, CalendarDays, Store, Pencil, Phone, Mail, User, X } from "lucide-react";
 import { createAppointment } from "@/slices/appointmentSlice";
 import { payCustomerDirect, finalizeInvoice } from "@/services";
 import PaymentModal from "@/components/modals/PaymentModal";
@@ -83,6 +83,14 @@ const allowedCountries: CountryCode[] = [
   "AU",
   "CN",
 ] as const;
+
+const isPhoneEmptyOrOnlyCallingCode = (value?: string): boolean => {
+  if (!value) return true;
+  const digitsOnly = value.replace(/\D/g, "");
+  const allowedCodes = ["91", "1", "63", "64", "61", "86"];
+  return allowedCodes.includes(digitsOnly) || digitsOnly.length === 0;
+};
+
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 const expiryToNumber = (exp: string): number => {
@@ -126,6 +134,8 @@ export default function ConfirmPage(): JSX.Element {
   const [consentOpen, setConsentOpen] = useState<boolean>(false);
   const [consentHeading, setConsentHeading] = useState<string>("");
   const [consentText, setConsentText] = useState<string>("");
+  const [isEditingInfo, setIsEditingInfo] = useState(false);
+
   const [consentEnforcement, setConsentEnforcement] =
     useState<EnforcementType | null>(null);
   const [pendingConsentServiceId, setPendingConsentServiceId] = useState<
@@ -167,7 +177,7 @@ export default function ConfirmPage(): JSX.Element {
     reset,
     trigger,
     setValue,
-    formState: { errors, isSubmitted, isSubmitting },
+    formState: { errors, isSubmitted },
   } = useForm<FormValues>({
     defaultValues: {
       firstName: userDetails?.firstName || "",
@@ -181,6 +191,11 @@ export default function ConfirmPage(): JSX.Element {
 
   const phoneValue = watch("phone");
   const emailValue = watch("email");
+
+  const isPhoneValid = phoneValue ? isValidPhoneNumber(phoneValue) : false;
+  const isEmailValid = emailValue ? /^\S+@\S+\.\S+$/.test(emailValue) : false;
+  const showPhoneAsterisk = !isEmailValid || isPhoneValid;
+  const showEmailAsterisk = !isPhoneValid || isEmailValid;
 
   const normalizePhone = (phone?: string): string =>
     phone?.replace(/\s+/g, "") || "";
@@ -411,18 +426,12 @@ export default function ConfirmPage(): JSX.Element {
 
     if (!value) {
       debouncedFetchRef.current?.cancel?.();
-
       lastQueryRef.current = "";
-
       setIsAutoFilled(false);
-
       setLoadingField(null);
-
       return;
     }
-
     setLoadingField(type);
-
     debouncedFetchRef.current?.({
       value,
       type,
@@ -698,19 +707,19 @@ export default function ConfirmPage(): JSX.Element {
     const userData = formData || userDetails;
     const ip = await getPublicIP();
     const tracking = {
-        marketing: {
-          utmSource: "website",
-          utmMedium: "plugin",
-          utmCampaign: "service-plugin",
-          utmTerm: "",
-          utmContent: "cta_book_now",
-        },
-        request: {
-          ipAddress: ip,
-          userAgent: navigator.userAgent,
-          referrer: window.location.hostname,
-          landingPage: window.location.href,
-        },
+      marketing: {
+        utmSource: "website",
+        utmMedium: "plugin",
+        utmCampaign: "service-plugin",
+        utmTerm: "",
+        utmContent: "cta_book_now",
+      },
+      request: {
+        ipAddress: ip,
+        userAgent: navigator.userAgent,
+        referrer: window.location.hostname,
+        landingPage: window.location.href,
+      },
     };
 
     const payload: AppointmentPayload = {
@@ -821,19 +830,19 @@ export default function ConfirmPage(): JSX.Element {
   const onSubmit: SubmitHandler<FormValues> = async (data): Promise<void> => {
     const ip = await getPublicIP();
     const tracking = {
-        marketing: {
-          utmSource: "website",
-          utmMedium: "plugin",
-          utmCampaign: "service-plugin",
-          utmTerm: "",
-          utmContent: "cta_book_now",
-        },
-        request: {
-          ipAddress: ip,
-          userAgent: navigator.userAgent,
-          referrer: window.location.hostname,
-          landingPage: window.location.href,
-        },
+      marketing: {
+        utmSource: "website",
+        utmMedium: "plugin",
+        utmCampaign: "service-plugin",
+        utmTerm: "",
+        utmContent: "cta_book_now",
+      },
+      request: {
+        ipAddress: ip,
+        userAgent: navigator.userAgent,
+        referrer: window.location.hostname,
+        landingPage: window.location.href,
+      },
     };
     const payload = {
       ...data,
@@ -862,9 +871,10 @@ export default function ConfirmPage(): JSX.Element {
   const onFormSubmit: SubmitHandler<FormValues> = async (
     data,
   ): Promise<void> => {
+    const phone = isPhoneEmptyOrOnlyCallingCode(data.phone) ? "" : (data.phone ?? "");
     const payload = {
       ...data,
-      phone: data?.phone ?? "",
+      phone,
     };
     if (!payType) {
       return void toast.error("Select payment method");
@@ -874,6 +884,7 @@ export default function ConfirmPage(): JSX.Element {
     }
     dispatch(setUserDetails(payload));
     dispatch(setSidebarOpen(true));
+    setIsEditingInfo(false);
   };
 
   // ─── Payment helpers ────────────────────────────────────────────────────────
@@ -899,20 +910,20 @@ export default function ConfirmPage(): JSX.Element {
       const detectedCardType = getCardType(cardData.number);
       const ip = await getPublicIP();
       const tracking = {
-          marketing: {
-            utmSource: "website",
-            utmMedium: "plugin",
-            utmCampaign: "service-plugin",
-            utmTerm: "",
-            utmContent: "cta_book_now",
-          },
-          request: {
-            ipAddress: ip,
-            userAgent: navigator.userAgent,
-            referrer: window.location.hostname,
-            landingPage: window.location.href,
-          },
-      };  
+        marketing: {
+          utmSource: "website",
+          utmMedium: "plugin",
+          utmCampaign: "service-plugin",
+          utmTerm: "",
+          utmContent: "cta_book_now",
+        },
+        request: {
+          ipAddress: ip,
+          userAgent: navigator.userAgent,
+          referrer: window.location.hostname,
+          landingPage: window.location.href,
+        },
+      };
 
       const paymentPayload: PaymentPayload = {
         appointmentId,
@@ -998,7 +1009,15 @@ export default function ConfirmPage(): JSX.Element {
 
     dispatch(nextStep());
   };
-
+  const handleCancelEdit = () => {
+    reset({
+      firstName: userDetails?.firstName || "",
+      lastName: userDetails?.lastName || "",
+      phone: userDetails?.phone || "",
+      email: userDetails?.email || "",
+    });
+    setIsEditingInfo(false);
+  };
   return (
     <MainLayout
       sidebar={
@@ -1059,7 +1078,7 @@ export default function ConfirmPage(): JSX.Element {
                           {selectedProfessional?.name}
                         </p>
                         <p className="aaravpos-appointment-services">
-                          {services.map((s) => s.name).join(", ")}
+                          {selectedProfessional?.staff_type}
                         </p>
                       </div>
                       <span className="aaravpos-appointment-price">
@@ -1091,13 +1110,13 @@ export default function ConfirmPage(): JSX.Element {
                   /> */}
                 </div>
               </div>
-              {payType && (
+              {/* {payType && (
+
                 <form className="aaravpos-tp-10" onSubmit={handleSubmit(onFormSubmit)}>
                   <div className="aaravpos-details-grid">
                     <div className="aaravpos-form-group">
                       <label className="aaravpos-form-label" htmlFor="phone">
-                        Phone{" "}
-                        {!emailValue && (
+                        Phone {showPhoneAsterisk && (
                           <span className="aaravpos-required">*</span>
                         )}
                       </label>
@@ -1106,8 +1125,8 @@ export default function ConfirmPage(): JSX.Element {
                         name="phone"
                         rules={{
                           validate: (value) => {
-                            const hasPhone = !!normalizePhone(value);
-                            const hasEmail = !!emailValue?.trim();
+                            const hasPhone = !isPhoneEmptyOrOnlyCallingCode(value);
+                            const hasEmail = emailValue && /^\S+@\S+\.\S+$/.test(emailValue);
                             if (!hasPhone && !hasEmail) {
                               return "Enter phone or email";
                             }
@@ -1164,8 +1183,7 @@ export default function ConfirmPage(): JSX.Element {
                     </div>
                     <div className="aaravpos-form-group">
                       <label htmlFor="email" className="aaravpos-form-label">
-                        Email{" "}
-                        {!phoneValue && (
+                        Email {showEmailAsterisk && (
                           <span className="aaravpos-required">*</span>
                         )}
                       </label>
@@ -1174,7 +1192,7 @@ export default function ConfirmPage(): JSX.Element {
                         {...register("email", {
                           validate: (value) => {
                             const hasEmail = !!value?.trim();
-                            const hasPhone = !!normalizePhone(phoneValue);
+                            const hasPhone = !isPhoneEmptyOrOnlyCallingCode(phoneValue);
                             if (!hasEmail && !hasPhone) {
                               return "Enter phone or email";
                             }
@@ -1251,6 +1269,326 @@ export default function ConfirmPage(): JSX.Element {
                     </button>
                   </div>
                 </form>
+              )} */}
+              {payType && (
+                <div className="booking-confirm-scroll-container">
+                  {!isEditingInfo ? (
+                    <>
+                      <div className="booking-confirm-header-row">
+                        <h4 className="booking-confirm-title">
+                          Your information
+                        </h4>
+                        <button
+                          type="button"
+                          onClick={() => setIsEditingInfo(true)}
+                          className="booking-confirm-edit-btn"
+                        >
+                          <Pencil size={13} />
+                          Edit
+                        </button>
+                      </div>
+
+                      <div className="booking-confirm-info-box">
+                        {/* Alert Banner */}
+                        <div className="booking-confirm-alert-banner">
+                          <div className="booking-confirm-alert-circle">
+                            <Check size={12} className="booking-confirm-alert-check-icon" />
+                          </div>
+                          <span className="booking-confirm-alert-text">
+                            Details completed in the previous step
+                          </span>
+                        </div>
+
+                        {/* Details Grid */}
+                        <div className="booking-confirm-info-grid">
+                          {/* Phone */}
+                          <div className="booking-confirm-info-item">
+                            <div className="booking-confirm-icon-circle">
+                              <Phone size={15} />
+                            </div>
+                            <div>
+                              <SectionLabel>Phone</SectionLabel>
+
+                              <p className="booking-confirm-info-val">
+                                {userDetails?.phone || "-"}
+                              </p>
+                            </div>
+                          </div>
+
+                          {/* Email */}
+                          <div className="booking-confirm-info-item">
+                            <div className="booking-confirm-icon-circle">
+                              <Mail size={15} />
+                            </div>
+                            <div>
+                              <SectionLabel>Email</SectionLabel>
+                              <p className="booking-confirm-info-val booking-confirm-break-all">
+                                {userDetails?.email || "-"}
+                              </p>
+                            </div>
+                          </div>
+
+                          {/* First Name */}
+                          <div className="booking-confirm-info-item">
+                            <div className="booking-confirm-icon-circle">
+                              <User size={15} />
+                            </div>
+                            <div>
+                              <SectionLabel>First Name</SectionLabel>
+                              <p className="booking-confirm-info-val">
+                                {userDetails?.firstName || "-"}
+                              </p>
+                            </div>
+                          </div>
+
+                          {/* Last Name */}
+                          <div className="booking-confirm-info-item">
+                            <div className="booking-confirm-icon-circle">
+                              <User size={15} />
+                            </div>
+                            <div>
+                              <SectionLabel>Last Name</SectionLabel>
+                              <p className="booking-confirm-info-val">
+                                {userDetails?.lastName || "-"}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <form onSubmit={handleSubmit(onFormSubmit)}>
+                      <h4 className="booking-confirm-form-title">
+                        Your information
+                      </h4>
+                      <div className="booking-confirm-info-box">
+                        <div className="booking-confirm-form-grid">
+                          <div className="booking-confirm-field">
+                            <label
+                              className="booking-confirm-field-label"
+                              htmlFor="phone"
+                            >
+                              Phone {showPhoneAsterisk && (
+                                <span className="booking-confirm-field-required">*</span>
+                              )}
+                            </label>
+                            <Controller
+                              control={control}
+                              name="phone"
+                              rules={{
+                                validate: (value) => {
+                                  const hasPhone = !isPhoneEmptyOrOnlyCallingCode(value);
+                                  const hasEmail = emailValue && /^\S+@\S+\.\S+$/.test(emailValue);
+                                  if (!hasPhone && !hasEmail) {
+                                    return "Enter phone or email";
+                                  }
+                                  if (hasPhone && !isValidPhoneNumber(value)) {
+                                    return "Enter valid phone number";
+                                  }
+                                  return true;
+                                },
+                              }}
+                              render={({ field }) => (
+                                <div className="booking-confirm-input-wrapper">
+                                  <PhoneInput
+                                    {...field}
+                                    id="phone"
+                                    international
+                                    countries={allowedCountries}
+                                    defaultCountry="US"
+                                    value={field.value || ""}
+                                    onChange={(value) =>
+                                      handleInputChange(
+                                        value ?? "",
+                                        field.onChange,
+                                        "phone",
+                                      )
+                                    }
+                                    countryCallingCodeEditable={false}
+                                    className="booking-confirm-input"
+                                  />
+                                  {loading && loadingField === "phone" && (
+                                    <div className="booking-confirm-phone-loader">
+                                      <div className="booking-confirm-phone-spinner" />
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+                            />
+                            {errors.phone && (
+                              <p className="booking-confirm-error">
+                                {errors.phone.message}
+                              </p>
+                            )}
+                            {isAutoFilled && (
+                              <div className="booking-confirm-autofill-info">
+                                Using existing customer
+                                <span
+                                  onClick={handleClearCustomer}
+                                  className="booking-confirm-clear-action"
+                                >
+                                  Clear
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                          <div className="booking-confirm-field">
+                            <label
+                              className="booking-confirm-field-label"
+                              htmlFor="email"
+                            >
+                              Email {showEmailAsterisk && (
+                                <span className="booking-confirm-field-required">*</span>
+                              )}
+                            </label>
+                            <div className="booking-confirm-input-wrapper">
+                              <input
+                                id="email"
+                                minLength={10}
+                                maxLength={50}
+                                {...register("email", {
+                                  minLength: {
+                                    value: 10,
+                                    message: "Minimum 2 characters required",
+                                  },
+                                  maxLength: {
+                                    value: 50,
+                                    message: "Email must be maximum 50 characters",
+                                  },
+                                  validate: (value) => {
+                                    const hasEmail = !!value?.trim();
+                                    const hasPhone = !isPhoneEmptyOrOnlyCallingCode(phoneValue);
+                                    if (!hasEmail && !hasPhone)
+                                      return "Enter phone or email";
+                                    if (
+                                      hasEmail &&
+                                      !/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(
+                                        value,
+                                      )
+                                    )
+                                      return "Invalid email";
+                                    return true;
+                                  },
+                                  onChange: (e) => {
+                                    handleInputChange(
+                                      e.target.value,
+                                      null,
+                                      "email",
+                                    );
+                                  },
+                                })}
+                                autoComplete="email"
+                                placeholder="Email address"
+                                className="booking-confirm-input"
+                              />
+                              {loading && loadingField === "email" && (
+                                <div className="booking-confirm-phone-loader">
+                                  <div className="booking-confirm-phone-spinner" />
+                                </div>
+                              )}
+                            </div>
+                            {errors.email && (
+                              <p className="booking-confirm-error">
+                                {errors.email.message}
+                              </p>
+                            )}
+                          </div>
+                          <div className="booking-confirm-field">
+                            <label
+                              htmlFor="firstName"
+                              className="booking-confirm-field-label"
+                            >
+                              First Name <span className="booking-confirm-field-required">*</span>
+                            </label>
+                            <input
+                              id="firstName"
+                              minLength={2}
+                              maxLength={30}
+                              {...register("firstName", {
+                                required: "First name required",
+                                pattern: {
+                                  value: /^[A-Za-z\s]+$/,
+                                  message: "Only letters are allowed",
+                                },
+                                minLength: {
+                                  value: 2,
+                                  message: "Minimum 2 characters required",
+                                },
+                                maxLength: {
+                                  value: 30,
+                                  message: "Maximum 30 characters allowed",
+                                },
+                              })}
+                              autoComplete="given-name"
+                              placeholder="First Name"
+                              className="booking-confirm-input"
+                            />
+                            {errors.firstName && (
+                              <p className="booking-confirm-error">
+                                {errors.firstName.message}
+                              </p>
+                            )}
+                          </div>
+                          <div className="booking-confirm-field">
+                            <label
+                              htmlFor="lastName"
+                              className="booking-confirm-field-label"
+                            >
+                              Last Name
+                            </label>
+                            <input
+                              minLength={2}
+                              maxLength={20}
+                              id="lastName"
+                              autoComplete="family-name"
+                              {...register("lastName", {
+                                minLength: {
+                                  value: 2,
+                                  message:
+                                    "Last name must be at least 2 characters",
+                                },
+                                maxLength: {
+                                  value: 30,
+                                  message: "Last name cannot exceed 30 characters",
+                                },
+                                pattern: {
+                                  value: /^[A-Za-z\s]+$/,
+                                  message: "Only letters are allowed",
+                                },
+                              })}
+                              placeholder="Last Name"
+                              className="booking-confirm-input"
+                            />
+                            {errors.lastName && (
+                              <p className="booking-confirm-error">
+                                {errors.lastName.message}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Save / Cancel buttons */}
+                        <div className="booking-confirm-btn-group">
+                          <button
+                            type="button"
+                            onClick={handleCancelEdit}
+                            className="booking-confirm-cancel-btn"
+                          >
+                            <X size={14} />
+                            Cancel
+                          </button>
+                          <button
+                            type="submit"
+                            className="booking-confirm-save-btn"
+                          >
+                            <Check size={14} className="booking-confirm-save-check-icon" />
+                            Save changes
+                          </button>
+                        </div>
+                      </div>
+                    </form>
+                  )}
+                </div>
               )}
             </div>
           </div>

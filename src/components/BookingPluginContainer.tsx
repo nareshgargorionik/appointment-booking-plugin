@@ -5,7 +5,7 @@ import { AppointmentBookingPluginProps, Outlet, OutletRootState, } from "@/types
 import { fetchAllCategoriesAndStaffService } from "@/services";
 import { setOutletData, setOutletToken } from "@/slices/outletSlice";
 import { setOutletList } from "@/slices/outletListSlice";
-import { setServicePayload } from "@/slices/serviceSlice";
+import { setServicePayload, setServiceLoading } from "@/slices/serviceSlice";
 import { setTheme } from "@/slices/themeSlice";
 import { setIsOrder, goToStep } from "@/slices/breadcrumbSlice";
 import { applyTheme } from "@/utils/applyTheme";
@@ -48,6 +48,7 @@ export const BookingPluginContainer: React.FC<AppointmentBookingPluginProps> = (
 
     const fetchOutletData = async (tenantId?: string, outletId?: string) => {
         try {
+            dispatch(setServiceLoading(true));
             const response = await fetchAllCategoriesAndStaffService(bookingCode, tenantId, outletId);
             if (!response?.success) {
                 setError(response?.message || "Failed to fetch outlet data");

@@ -7,6 +7,7 @@ const initialState: ServiceState = {
   selectedCategory: null,
   selectedServices: [],
   selectedProfessional: null,
+  loading: true,
 };
 
 const serviceSlice = createSlice({
@@ -22,46 +23,43 @@ const serviceSlice = createSlice({
     ) => {
       state.superCategories = action.payload.superCategories;
       state.staff = action.payload.staff;
+      state.loading = false;
+    },
+    setServiceLoading: (state, action: PayloadAction<boolean>) => {
+      state.loading = action.payload;
     },
     setCategory: (state, action: PayloadAction<Category | null>) => {
       state.selectedCategory = action.payload;
     },
     toggleService: (state, action) => {
-      const existing = state.selectedServices.find(
+      const isSelected = state.selectedServices.some(
         (s) => s.id === action.payload.id
       );
-      if (existing) {
-        if (existing.qty < 5) {
-          existing.qty += 1;
-        }
+
+      if (isSelected) {
+        state.selectedServices = [];
+      } else {
+        state.selectedServices = [
+          {
+            ...action.payload,
+            qty: 1,
+          },
+        ];
+      }
+    },
+
+    toggleAdditionalService: (state, action) => {
+      const existingIndex = state.selectedServices.findIndex(
+        (s) => s.id === action.payload.id
+      );
+
+      if (existingIndex > -1) {
+        state.selectedServices.splice(existingIndex, 1);
       } else {
         state.selectedServices.push({
           ...action.payload,
           qty: 1,
         });
-      }
-    },
-    incrementService: (state, action: PayloadAction<string>) => {
-      const item = state.selectedServices.find(
-        (s) => s.id === action.payload
-      );
-      if (item && item.qty < 5) {
-        item.qty += 1;
-      }
-    },
-    decrementService: (state, action: PayloadAction<string>) => {
-      const item = state.selectedServices.find(
-        (s) => s.id === action.payload
-      );
-      if (item) {
-        if (item.qty === 1) {
-          state.selectedServices =
-            state.selectedServices.filter(
-              (s) => s.id !== action.payload
-            );
-        } else {
-          item.qty -= 1;
-        }
       }
     },
     toggleProfessional: (state, action) => {
@@ -78,12 +76,12 @@ const serviceSlice = createSlice({
 
 export const {
   setServicePayload,
+  setServiceLoading,
   setCategory,
   toggleService,
+  toggleAdditionalService,
   clearSelectedServices,
   clearSelectedProfessional,
-  incrementService,
-  decrementService,
   toggleProfessional,
 } = serviceSlice.actions;
 
