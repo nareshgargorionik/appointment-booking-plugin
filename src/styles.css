@@ -225,7 +225,7 @@
   transition: all 0.2s ease;
   border-radius: 6px;
   position: absolute;
-  bottom: 25px;
+  bottom: 20px;
   z-index: 50;
   display: flex;
   align-items: center;
@@ -1206,8 +1206,14 @@
 
 .aaravpos-staff-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(195px, 1fr));
   gap: 12px;
+}
+
+@media (max-width: 1024px) {
+  .aaravpos-staff-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 .aaravpos-display-flex {
@@ -5025,7 +5031,7 @@
 }
 
 .booking-slider-backdrop {
-  position: fixed;
+  position: absolute;
   top: 0;
   right: 0;
   bottom: 0;
@@ -5036,7 +5042,7 @@
 }
 
 .booking-slider-sheet {
-  position: fixed;
+  position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
@@ -5253,7 +5259,7 @@
 
 /* Mobile CTA Action Wrapper and Button Styles in MainLayout */
 .aaravpos-mobile-action-wrapper {
-  position: fixed;
+  position: absolute;
   bottom: 20px;
   left: 0;
   right: 0;
@@ -5264,7 +5270,7 @@
   padding: 0 16px;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
   .aaravpos-mobile-action-wrapper {
     display: none !important;
   }
