@@ -4,7 +4,6 @@ import { getUserName, calculateServiceTax, CurrencyIcon } from "@/utils";
 import { setSelectedDate } from "@/slices/slotSlice";
 import { nextStep } from "@/slices/breadcrumbSlice";
 import { toggleProfessional, toggleAdditionalService } from "@/slices/serviceSlice";
-import { setSidebarOpen } from "@/slices/themeSlice";
 import MainLayout from "@/components/common/MainLayout";
 import ProfessionalSidebar from "@/components/sidebar/ProfessionalSidebar";
 import Breadcrumb from "@/components/common/Breadcrumb";
