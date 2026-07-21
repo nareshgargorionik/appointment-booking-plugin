@@ -123,8 +123,6 @@ const ProfessionalSidebar = ({
                       </p>
                     </div>
                     <div className="aaravpos-order-details">
-                      <div className="aaravpos-order-detail">
-                      </div>
                       <div className="aaravpos-order-detail center">
                         <Clock3 size={13} />
                         <span>{svc.min_time || svc.estimated_time} min</span>

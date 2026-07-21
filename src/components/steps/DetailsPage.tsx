@@ -100,11 +100,15 @@ export default function DetailsPage(): JSX.Element {
             if (!value) return;
             let searchKey = "";
             if (type === "phone") {
-                if (!isValidPhoneNumber(value)) return;
+                if (!isValidPhoneNumber(value)) {
+                    return;
+                }
                 searchKey = normalizePhone(value);
             }
             if (type === "email") {
-                if (!isValidEmail(value)) return;
+                if (!isValidEmail(value)) {
+                    return;
+                }
                 searchKey = value.trim();
             }
             if (!searchKey) return;
@@ -141,13 +145,13 @@ export default function DetailsPage(): JSX.Element {
                     setIsAutoFilled(false);
                 }
             } catch (err) {
-                console.error(err);
+                console.error("fetchCustomerData error:", err);
             } finally {
                 setLoading(false);
                 setLoadingField(null);
             }
         },
-        [dispatch, setValue, isAutoFilled],
+        [dispatch, setValue, tenantId, isAutoFilled],
     );
 
     const handleClearCustomer = (): void => {
@@ -163,7 +167,7 @@ export default function DetailsPage(): JSX.Element {
     };
 
     useEffect(() => {
-        debouncedFetchRef.current = debounce(fetchCustomerData, 800,);
+        debouncedFetchRef.current = debounce(fetchCustomerData, 800);
         return () => {
             debouncedFetchRef.current?.cancel?.();
         };

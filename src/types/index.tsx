@@ -89,6 +89,9 @@ export interface MainLayoutProps {
   children: ReactNode;
   sidebar?: ReactNode;
   renderButton?: ReactNode;
+  isConfirm?: boolean;
+  handleSidebarOpen?: () => void;
+  isSidebarOpen?: boolean;
 }
 
 /* ─────────────────────────────────────────────────────────────

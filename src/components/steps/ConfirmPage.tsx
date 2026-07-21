@@ -1018,8 +1018,20 @@ export default function ConfirmPage(): JSX.Element {
     });
     setIsEditingInfo(false);
   };
+  const isBookingDisabled = () => {
+    if (!selectedProfessional?.id) return true;
+    if (!selectedTime && bookingMode === "booking") return true;
+    if (!watch("firstName")) return true;
+    if (!watch("email") && !watch("phone")) return true;
+
+    return false;
+  };
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
   return (
     <MainLayout
+      isSidebarOpen={isSidebarOpen}
+      handleSidebarOpen={() => setIsSidebarOpen((prev) => !prev)}
       sidebar={
         <div className="aaravpos-aside">
           <OrderSidebar
@@ -1035,10 +1047,12 @@ export default function ConfirmPage(): JSX.Element {
             totalConsents={totalConsentCount}
             checkingConsent={checkingConsent}
             loading={loading}
-          // isBookingDisabled={isBookingDisabled()}
+            isBookingDisabled={isBookingDisabled()}
+            handleSidebarOpen={() => setIsSidebarOpen((prev) => !prev)}
           />
         </div>
       }
+      isConfirm={true}
     >
       <>
         <Breadcrumb />

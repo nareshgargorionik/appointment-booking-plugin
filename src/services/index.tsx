@@ -135,7 +135,7 @@ export const fetchCustomer = async ({
 
     const response = await res.json();
 
-    return response;
+    return response?.data;
 };
 
 // Pay Customer Directly

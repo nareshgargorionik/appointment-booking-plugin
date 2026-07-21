@@ -41,6 +41,7 @@ interface OrderSidebarProps {
   checkingConsent?: boolean;
   loading?: boolean;
   isBookingDisabled?: boolean;
+  handleSidebarOpen: () => void;
 }
 
 export default function OrderSidebar({
@@ -56,6 +57,7 @@ export default function OrderSidebar({
   checkingConsent = false,
   loading = false,
   isBookingDisabled = false,
+  handleSidebarOpen,
 }: OrderSidebarProps): JSX.Element {
   const dispatch = useDispatch<AppDispatch>();
 
@@ -224,12 +226,14 @@ export default function OrderSidebar({
       <div className="aaravpos-order-header">
         <p className="aaravpos-order-title">
           Your Order
-          <button
-            className="aaravpos-sidebar-close-btn"
-            onClick={() => dispatch(setSidebarOpen(false))}
-          >
-            <X size={18} />
-          </button>
+          {handleSidebarOpen && (
+            <button
+              className="aaravpos-sidebar-close-btn"
+              onClick={() => handleSidebarOpen()}
+            >
+              <X />
+            </button>
+          )}
         </p>
         {selectedProfessional?.id && (
           <div className="aaravpos-pro-card aaravpos-display-flex aaravpos-mb-10 aaravpos-tp-10">
@@ -377,6 +381,12 @@ export default function OrderSidebar({
               </>
             }
           />
+          {totalDuration > 0 && (
+            <PriceRow
+              label="Total Duration"
+              value={`${totalDuration} min`}
+            />
+          )}
           {showTip && (
             <PriceRow
               label={`Tip (${safeTipPct}%)`}

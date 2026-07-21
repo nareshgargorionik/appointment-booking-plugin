@@ -10,7 +10,7 @@ import ProfessionalSidebar from "@/components/sidebar/ProfessionalSidebar";
 import Breadcrumb from "@/components/common/Breadcrumb";
 import ProfessionalSkeletonCard from "@/components/common/ProfessionalSkeletonCard";
 import { useWindowSize } from "@/hooks/useWindowSize";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, X } from "lucide-react";
 import { ServiceItem } from "@/types";
 
 export default function Professionals() {
@@ -20,7 +20,7 @@ export default function Professionals() {
     (state: any) => state.booking.service,
   );
   const [showEmpty, setShowEmpty] = useState<boolean>(false);
-  const isMobile = width < 768;
+  const isMobile = width < 1024;
 
   const selectedServiceIds = selectedServices.map((s: ServiceItem) => s.id);
   const hasServicesSelected = selectedServices.length > 0;
@@ -160,6 +160,7 @@ export default function Professionals() {
       )
     );
   };
+  const [isBottomSliderOpen, setIsBottomSliderOpen] = useState(false);
 
   return (
     <MainLayout
@@ -173,28 +174,26 @@ export default function Professionals() {
         />
       }
       renderButton={
-        isMobile && selectedProfessional ? (
+        isMobile && selectedProfessional && !isBottomSliderOpen ? (
           <button
             onClick={() => dispatch(nextStep())}
-            disabled={!selectedServices.length}
             className="aaravpos-btn"
+            disabled={!selectedServices.length}
           >
-            <span className="aaravpos-btn-content">
-              Choose Time <ChevronRight size={16} />
+            <span>{selectedServices.length} {selectedServices.length === 1 ? "Service" : "Services"} Selected</span>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 600 }}>
+              Next <ChevronRight size={16} />
             </span>
           </button>
-
-          // <div className="fixed bottom-4 left-0 right-0 flex justify-center px-4 z-50">
-          //   <button
-          //     onClick={() => dispatch(nextStep())}
-          //     className="flex items-center justify-between bg-[var(--btn-bg)] text-white hover:bg-[var(--btn-bg-hover)] w-full max-w-[280px] p-3 px-6 rounded-full font-bold uppercase transition-all shadow-lg cursor-pointer text-xs tracking-wider border-none"
-          //   >
-          //     <span>{selectedServices.length} {selectedServices.length === 1 ? "Service" : "Services"} Selected</span>
-          //     <span className="flex items-center gap-1 font-semibold ml-auto">
-          //       Next
-          //     </span>
-          //   </button>
-          // </div>
+          // <button
+          //   onClick={() => dispatch(nextStep())}
+          //   disabled={!selectedServices.length}
+          //   className="aaravpos-btn"
+          // >
+          //   <span className="aaravpos-btn-content">
+          //     Choose Time <ChevronRight size={16} />
+          //   </span>
+          // </button>
         ) : null
       }
     >
@@ -237,8 +236,8 @@ export default function Professionals() {
                       if (isDisabled) return;
                       dispatch(toggleProfessional(p));
                       dispatch(setSelectedDate(null));
-                      if (!isMobile) {
-                        dispatch(setSidebarOpen(true));
+                      if (isMobile) {
+                        setIsBottomSliderOpen(true);
                       }
                     }}
                     className={`booking-pro-card ${isDisabled ? "disabled" : isSelected ? "active" : ""}`}
@@ -285,7 +284,7 @@ export default function Professionals() {
           </div>
 
           {/* Add-on Services Section */}
-          {selectedProfessional && remainingServices.length > 0 && (
+          {!isMobile && selectedProfessional && remainingServices.length > 0 && (
             <div className="booking-addon-title-section">
               <h2 className="booking-addon-heading">
                 Anything you wish to add?
@@ -335,6 +334,98 @@ export default function Professionals() {
                 })}
               </div>
             </div>
+          )}
+          {isMobile && isBottomSliderOpen && selectedProfessional && (
+            <>
+              {/* Backdrop */}
+              <div
+                onClick={() => setIsBottomSliderOpen(false)}
+                className="booking-slider-backdrop"
+              />
+              {/* Sheet Content */}
+              <div
+                className="booking-slider-sheet"
+              >
+                {/* Drag handle */}
+                <div className="booking-slider-drag-handle-container">
+                  <div className="booking-slider-drag-handle" />
+                </div>
+
+                {/* Header */}
+                <div className="booking-slider-header">
+                  <div className="booking-slider-header-text">
+                    <h3 className="booking-slider-title">
+                      Anything you wish to add?
+                    </h3>
+                    <p className="booking-slider-subtitle">
+                      Add more services performed by {selectedProfessional.name}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setIsBottomSliderOpen(false)}
+                    className="booking-slider-close-btn"
+                  >
+                    <X size={18} />
+                  </button>
+                </div>
+
+                {/* Scrollable list of services */}
+                <div className="booking-slider-list">
+                  {remainingServices.length > 0 ? (
+                    remainingServices.map((svc: any) => {
+                      const isSvcSelected = selectedServices.some((s: any) => s.id === svc.id);
+                      return (
+                        <div
+                          key={svc.id}
+                          onClick={() => dispatch(toggleAdditionalService(svc))}
+                          className={`booking-slider-item ${isSvcSelected ? "active" : ""}`}
+                        >
+                          <div className="booking-slider-item-content">
+                            <p className="booking-slider-item-name">
+                              {svc.name}
+                            </p>
+                            <p className="booking-slider-item-desc">
+                              {svc.description || "No description"}
+                            </p>
+                            <div className="booking-slider-item-meta">
+                              <span>{svc.duration} min</span>
+                              <span className="booking-slider-item-price">
+                                <CurrencyIcon size={10} className="mr-0.5" />
+                                {svc.price}
+                              </span>
+                            </div>
+                          </div>
+                          {/* Checkbox */}
+                          <div className="booking-slider-item-checkbox-wrapper">
+                            <input
+                              type="checkbox"
+                              checked={isSvcSelected}
+                              onChange={() => dispatch(toggleAdditionalService(svc))}
+                              onClick={(e) => e.stopPropagation()}
+                              className="booking-slider-checkbox"
+                            />
+                          </div>
+                        </div>
+                      );
+                    })
+                  ) : (
+                    <p className="booking-slider-empty-text">
+                      No additional services available.
+                    </p>
+                  )}
+                </div>
+
+                {/* Footer actions */}
+                <div className="booking-slider-footer">
+                  <button
+                    onClick={() => setIsBottomSliderOpen(false)}
+                    className="booking-slider-continue-btn"
+                  >
+                    Continue
+                  </button>
+                </div>
+              </div>
+            </>
           )}
         </div>
       </div>

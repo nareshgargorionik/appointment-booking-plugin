@@ -20,7 +20,7 @@ export default function SuccessPage(): JSX.Element {
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [showAllServices, setShowAllServices] = useState<boolean>(false);
-
+    console.log("appointment", appointment)
     useEffect(() => {
         if (!appointmentId) {
             setError("No appointment ID provided");
@@ -87,6 +87,7 @@ export default function SuccessPage(): JSX.Element {
     const tipAmt: number = (appointment.tipsCents || 0) / 100;
     const taxAmt = (appointment.taxCents || 0) / 100;
     const totalAmt = (appointment.totalCents || 0) / 100;
+    console.log("taxAmt", taxAmt)
 
     const totalWithTax =
         totalAmt > 0
