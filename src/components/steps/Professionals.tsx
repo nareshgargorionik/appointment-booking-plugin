@@ -242,9 +242,9 @@ export default function Professionals() {
                     }}
                     className={`booking-pro-card ${isDisabled ? "disabled" : isSelected ? "active" : ""}`}
                   >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '16px', width: '100%' }}>
+                    <div className="booking-pro-card-header">
                       {/* Avatar */}
-                      <div className="relative shrink-0 flex items-center justify-center">
+                      <div className="booking-pro-avatar-container">
                         {p.imageUrl ? (
                           <img
                             src={p.imageUrl}

@@ -4298,6 +4298,23 @@
   user-select: none;
 }
 
+.booking-pro-card-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+}
+
+@media (max-width: 1024px) {
+  .booking-pro-card {
+    padding: 12px 8px;
+  }
+
+  .booking-pro-card-header {
+    gap: 8px;
+  }
+}
+
 .booking-pro-card:hover {
   border-color: rgba(0, 0, 0, 0.2);
   /* hover:border-border-hover */
@@ -4346,6 +4363,19 @@
   object-fit: cover;
   border: 1px solid rgba(0, 0, 0, 0.1);
   flex-shrink: 0;
+}
+
+@media (max-width: 1024px) {
+  .booking-pro-avatar-circle {
+    width: 36px;
+    height: 36px;
+    font-size: 12px;
+  }
+
+  .booking-pro-avatar-img {
+    width: 36px;
+    height: 36px;
+  }
 }
 
 .booking-pro-info {
