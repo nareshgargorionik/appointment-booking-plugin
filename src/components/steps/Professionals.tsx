@@ -11,6 +11,7 @@ import ProfessionalSkeletonCard from "@/components/common/ProfessionalSkeletonCa
 import { useWindowSize } from "@/hooks/useWindowSize";
 import { ChevronRight, X } from "lucide-react";
 import { ServiceItem } from "@/types";
+import { setSidebarOpen } from "@/slices/themeSlice";
 
 export default function Professionals() {
   const { width } = useWindowSize();
@@ -234,6 +235,7 @@ export default function Professionals() {
                     onClick={() => {
                       if (isDisabled) return;
                       dispatch(toggleProfessional(p));
+                      dispatch(setSidebarOpen(true));
                       dispatch(setSelectedDate(null));
                       if (isMobile) {
                         setIsBottomSliderOpen(true);
