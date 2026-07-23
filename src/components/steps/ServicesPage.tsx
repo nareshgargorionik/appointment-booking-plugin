@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { Search, X } from "lucide-react";
 import {
   selectPrimaryService,
-  toggleService
 } from "@/slices/serviceSlice";
 import Breadcrumb from "@/components/common/Breadcrumb";
 import MainLayout from "@/components/common/MainLayout";
