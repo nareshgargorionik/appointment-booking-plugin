@@ -64,23 +64,32 @@ export const BookingPluginContainer: React.FC<AppointmentBookingPluginProps> = (
         }
     };
 
+    const [loadingOutletId, setLoadingOutletId] = useState<string | null>(null);
+
     const handleOutletSelection = async (data: Outlet) => {
-        if (!data) return;
-        await fetchOutletData(String(data?.tenantId), String(data?.id));
-        const updatedOutlet = {
-            ...data,
-            tenantId: data.tenantId ?? "",
-            currency: data.currency ?? "",
-            outletTimeZoneDate: DateTime.now()
-                .setZone(data?.timeZone)
-                .toFormat("yyyy-MM-dd"),
-            outletTimeZoneYear: DateTime.fromISO(
-                data?.createdAt,
-                { zone: "utc" }
-            ).setZone(data?.timeZone).year,
-        };
-        dispatch(setOutletData(updatedOutlet));
-        dispatch(goToStep(data?.isService ? "services" : "professionals"));
+        if (!data || loadingOutletId) return;
+        setLoadingOutletId(String(data.id));
+        try {
+            await fetchOutletData(String(data?.tenantId), String(data?.id));
+            const updatedOutlet = {
+                ...data,
+                tenantId: data.tenantId ?? "",
+                currency: data.currency ?? "",
+                outletTimeZoneDate: DateTime.now()
+                    .setZone(data?.timeZone)
+                    .toFormat("yyyy-MM-dd"),
+                outletTimeZoneYear: DateTime.fromISO(
+                    data?.createdAt,
+                    { zone: "utc" }
+                ).setZone(data?.timeZone).year,
+            };
+            dispatch(setOutletData(updatedOutlet));
+            dispatch(goToStep(data?.isService ? "services" : "professionals"));
+        } catch (err: any) {
+            console.error("fetchOutletData error:", err);
+        } finally {
+            setLoadingOutletId(null);
+        }
     };
 
     useEffect(() => {
@@ -113,8 +122,9 @@ export const BookingPluginContainer: React.FC<AppointmentBookingPluginProps> = (
                     outlets={outlets}
                     onSelectOutlet={(data: Outlet) => {
                         if (!data?.id) return;
-                        handleOutletSelection(data)
+                        handleOutletSelection(data);
                     }}
+                    loadingOutletId={loadingOutletId}
                 />
             ) : (
                 <DefaultAppointment />

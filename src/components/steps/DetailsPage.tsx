@@ -197,7 +197,7 @@ export default function DetailsPage(): JSX.Element {
             }
             renderButton={null}
         >
-            <form>
+            <form onSubmit={handleSubmit(onSubmit)}>
                 <Breadcrumb />
                 <div className="aaravpos-details-section aaravpos-margin-top-20">
                     <h1 className="aaravpos-page-title aaravpos-margin-bottom-20">
@@ -329,7 +329,7 @@ export default function DetailsPage(): JSX.Element {
                             </div>
                         </div>
                         <div className="aaravpos-center-items">
-                            <button onClick={handleSubmit(onSubmit)} disabled={isSubmitting} className="aaravpos-form-btn">
+                            <button type="submit" disabled={isSubmitting} className="aaravpos-form-btn">
                                 <span className="aaravpos-btn-content">
                                     {isSubmitting
                                         ? "Submitting..."

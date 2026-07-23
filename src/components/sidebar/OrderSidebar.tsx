@@ -225,6 +225,7 @@ export default function OrderSidebar({
           Your Order
           {handleSidebarOpen && (
             <button
+              type="button"
               className="aaravpos-sidebar-close-btn"
               onClick={() => handleSidebarOpen()}
             >
@@ -304,6 +305,7 @@ export default function OrderSidebar({
                 const isLast = index === [...TIP_OPTIONS, "custom"].length - 1;
                 return (
                   <button
+                    type="button"
                     key={item}
                     onClick={() => {
                       if (isCustom) {
@@ -415,6 +417,7 @@ export default function OrderSidebar({
             </span>
           </div>
           <button
+            type="button"
             onClick={onButtonClick}
             disabled={isButtonDisabled}
             className="aaravpos-common-btn aaravpos-padding-btn"

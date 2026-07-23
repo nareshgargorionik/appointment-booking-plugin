@@ -10,8 +10,13 @@ import Breadcrumb from "@/components/common/Breadcrumb";
 import ProfessionalSkeletonCard from "@/components/common/ProfessionalSkeletonCard";
 import { useWindowSize } from "@/hooks/useWindowSize";
 import { ChevronRight, X } from "lucide-react";
-import { ServiceItem } from "@/types";
+import { ServiceItem, TaxRow } from "@/types";
 import { setSidebarOpen } from "@/slices/themeSlice";
+import { isConsentRequiredService } from "@/services";
+
+const hasActiveTax = (svc: any): boolean => {
+  return svc?.taxRows?.some((tax: TaxRow) => tax.isActive) || false;
+};
 
 export default function Professionals() {
   const { width } = useWindowSize();
@@ -152,7 +157,7 @@ export default function Professionals() {
 
   // Check if a professional is disabled because they do not work on all selected services
   const isProfessionalDisabled = (p: any) => {
-    if (!selectedServices || selectedServices.length === 0) return false;
+    if (!selectedServices || selectedServices.length === 0) return true;
     const assignments = p.assignments ?? [];
     return !selectedServices.every((svc: any) =>
       assignments.some(
@@ -304,8 +309,18 @@ export default function Professionals() {
                       }}
                       className={`booking-addon-card ${isSelected ? "active" : ""}`}
                     >
+                      {/* TAX */}
+                      {hasActiveTax(svc) && (
+                        <span className="aaravpos-tax-badge">TAX</span>
+                      )}
+                      {/* CONSENT */}
+                      {isConsentRequiredService(svc) && (
+                        <span className="aaravpos-consent-badge">
+                          CONSENT
+                        </span>
+                      )}
 
-                      <div>
+                      <div style={{ marginTop: hasActiveTax(svc) || isConsentRequiredService(svc) ? 6 : 0 }}>
                         <p className="booking-addon-name">
                           {svc.name}
                         </p>
@@ -382,6 +397,18 @@ export default function Professionals() {
                           className={`booking-slider-item ${isSvcSelected ? "active" : ""}`}
                         >
                           <div className="booking-slider-item-content">
+                            {(hasActiveTax(svc) || isConsentRequiredService(svc)) && (
+                              <div className="aaravpos-slider-badges">
+                                {hasActiveTax(svc) && (
+                                  <span className="aaravpos-slider-tax-badge">TAX</span>
+                                )}
+                                {isConsentRequiredService(svc) && (
+                                  <span className="aaravpos-slider-consent-badge">
+                                    CONSENT
+                                  </span>
+                                )}
+                              </div>
+                            )}
                             <p className="booking-slider-item-name">
                               {svc.name}
                             </p>

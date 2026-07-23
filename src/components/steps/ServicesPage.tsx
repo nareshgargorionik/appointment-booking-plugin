@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Search, X } from "lucide-react";
 import {
+  selectPrimaryService,
   toggleService
 } from "@/slices/serviceSlice";
 import Breadcrumb from "@/components/common/Breadcrumb";
@@ -223,14 +224,12 @@ export default function ServicesPage() {
                   </div>
                 ) : (
                   servicesToShow?.map((svc: any, index: number) => {
-                    const isSelected = selectedServices.some(
-                      (s: any) => s.id === svc.id,
-                    );
+                    const isSelected = selectedServices[0]?.id === svc.id;
                     return (
                       <div
                         key={index}
                         onClick={() => {
-                          dispatch(toggleService(svc));
+                          dispatch(selectPrimaryService(svc));
                           dispatch(nextStep());
                           // const exists = selectedServices.find(
                           //   (s: any) => s.id === svc.id,

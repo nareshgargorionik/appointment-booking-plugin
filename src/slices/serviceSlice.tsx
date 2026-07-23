@@ -31,6 +31,37 @@ const serviceSlice = createSlice({
     setCategory: (state, action: PayloadAction<Category | null>) => {
       state.selectedCategory = action.payload;
     },
+    selectPrimaryService: (state, action) => {
+      const newService = action.payload;
+      const currentPrimaryId = state.selectedServices[0]?.id;
+
+      if (currentPrimaryId !== newService.id) {
+        state.selectedServices = [
+          {
+            ...newService,
+            qty: 1,
+          },
+        ];
+        if (state.selectedProfessional) {
+          const assignments = state.selectedProfessional.assignments ?? [];
+          const performsNewService = assignments.some(
+            (a: any) => String(a.id) === String(newService.id) && Boolean(a.assigned)
+          );
+          if (!performsNewService) {
+            state.selectedProfessional = null;
+          }
+        }
+      } else {
+        if (!state.selectedServices.length) {
+          state.selectedServices = [
+            {
+              ...newService,
+              qty: 1,
+            },
+          ];
+        }
+      }
+    },
     toggleService: (state, action) => {
       const isSelected = state.selectedServices.some(
         (s) => s.id === action.payload.id
@@ -78,6 +109,7 @@ export const {
   setServicePayload,
   setServiceLoading,
   setCategory,
+  selectPrimaryService,
   toggleService,
   toggleAdditionalService,
   clearSelectedServices,

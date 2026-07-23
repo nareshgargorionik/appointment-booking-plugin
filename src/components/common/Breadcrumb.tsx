@@ -156,6 +156,7 @@ export default function Breadcrumb() {
       {isMobile ? (
         <div className="aaravpos-mobile-stepper">
           <button
+            type="button"
             onClick={goToPrev}
             className="aaravpos-mobile-back-btn"
           >
@@ -167,7 +168,7 @@ export default function Breadcrumb() {
         </div>
       ) : (
         <div className="aaravpos-desktop-stepper">
-          <button onClick={hasMultipleOutlets ? goToOutletsPrev : goToPrev} className="aaravpos-desktop-back-btn">
+          <button type="button" onClick={hasMultipleOutlets ? goToOutletsPrev : goToPrev} className="aaravpos-desktop-back-btn">
             <ChevronLeft size={20} />
           </button>
           <nav className="aaravpos-step-nav">
@@ -177,6 +178,7 @@ export default function Breadcrumb() {
               const isClickable = isCompleted || i <= currentIndex;
               return (
                 <button
+                  type="button"
                   key={step.page}
                   onClick={() => {
                     if (!isClickable) return;
@@ -202,6 +204,7 @@ export default function Breadcrumb() {
           </nav>
           {!isOpenSidebar && (
             <button
+              type="button"
               className="aaravpos-cart-btn"
               onClick={() => dispatch(setSidebarOpen(true))}
             >
