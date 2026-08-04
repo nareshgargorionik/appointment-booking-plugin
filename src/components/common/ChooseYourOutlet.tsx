@@ -71,7 +71,7 @@ export default function ChooseYourOutlet({
   const [selected, setSelected] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
 
-  const activeLoadingId = loadingOutletId || (selected && loadingOutletId !== null ? selected : null);
+  // const activeLoadingId = loadingOutletId || (selected && loadingOutletId !== null ? selected : null);
   const isAnyLoading = Boolean(loadingOutletId);
 
   const handleSelectOutlet = (id: string) => {
