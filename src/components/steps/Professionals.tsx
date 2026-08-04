@@ -1,27 +1,27 @@
 import { useMemo, useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { getUserName, calculateServiceTax, CurrencyIcon } from "@/utils";
+import { getUserName, calculateServiceTax } from "@/utils";
 import { setSelectedDate } from "@/slices/slotSlice";
 import { nextStep } from "@/slices/breadcrumbSlice";
-import { toggleProfessional, toggleAdditionalService } from "@/slices/serviceSlice";
+import { toggleProfessional } from "@/slices/serviceSlice";
 import MainLayout from "@/components/common/MainLayout";
 import ProfessionalSidebar from "@/components/sidebar/ProfessionalSidebar";
 import Breadcrumb from "@/components/common/Breadcrumb";
 import ProfessionalSkeletonCard from "@/components/common/ProfessionalSkeletonCard";
 import { useWindowSize } from "@/hooks/useWindowSize";
-import { ChevronRight, X } from "lucide-react";
-import { ServiceItem, TaxRow } from "@/types";
-import { setSidebarOpen } from "@/slices/themeSlice";
-import { isConsentRequiredService } from "@/services";
+import { ChevronRight } from "lucide-react";
+import { ServiceItem } from "@/types";
+// import { setSidebarOpen } from "@/slices/themeSlice";
+// import { isConsentRequiredService } from "@/services";
 
-const hasActiveTax = (svc: any): boolean => {
-  return svc?.taxRows?.some((tax: TaxRow) => tax.isActive) || false;
-};
+// const hasActiveTax = (svc: any): boolean => {
+//   return svc?.taxRows?.some((tax: TaxRow) => tax.isActive) || false;
+// };
 
 export default function Professionals() {
   const { width } = useWindowSize();
   const dispatch = useDispatch();
-  const { staff, selectedServices, selectedProfessional, superCategories, loading } = useSelector(
+  const { staff, selectedServices, selectedProfessional, loading } = useSelector(
     (state: any) => state.booking.service,
   );
   const [showEmpty, setShowEmpty] = useState<boolean>(false);
@@ -84,37 +84,37 @@ export default function Professionals() {
   };
 
   // Find all services in the outlet
-  const allServices = useMemo(() => {
-    return (
-      superCategories?.flatMap((superCat: any) =>
-        superCat?.categories?.flatMap((cat: any) => cat.services || []),
-      ) || []
-    );
-  }, [superCategories]);
+  // const allServices = useMemo(() => {
+  //   return (
+  //     superCategories?.flatMap((superCat: any) =>
+  //       superCat?.categories?.flatMap((cat: any) => cat.services || []),
+  //     ) || []
+  //   );
+  // }, [superCategories]);
 
   // Find assigned services of the selected professional (addon services list)
-  const remainingServices = useMemo(() => {
-    if (!selectedProfessional) return [];
-    const assignments = selectedProfessional.assignments ?? [];
-    const activeAssignments = assignments.filter((a: any) => a.assigned);
-    const assignedServiceIds = activeAssignments.map((a: any) => String(a.id));
-    const primaryServiceId = String(selectedServices[0]?.id);
+  // const remainingServices = useMemo(() => {
+  //   if (!selectedProfessional) return [];
+  //   const assignments = selectedProfessional.assignments ?? [];
+  //   const activeAssignments = assignments.filter((a: any) => a.assigned);
+  //   const assignedServiceIds = activeAssignments.map((a: any) => String(a.id));
+  //   const primaryServiceId = String(selectedServices[0]?.id);
 
-    return allServices
-      .filter(
-        (svc: any) =>
-          assignedServiceIds.includes(String(svc.id)) &&
-          String(svc.id) !== primaryServiceId
-      )
-      .map((svc: any) => {
-        const assignment = activeAssignments.find((a: any) => String(a.id) === String(svc.id));
-        return {
-          ...svc,
-          price: assignment?.price || svc.price || svc.min_price || 0,
-          duration: assignment?.duration || svc.estimated_time || svc.min_time || 0,
-        };
-      });
-  }, [allServices, selectedProfessional, selectedServices]);
+  //   return allServices
+  //     .filter(
+  //       (svc: any) =>
+  //         assignedServiceIds.includes(String(svc.id)) &&
+  //         String(svc.id) !== primaryServiceId
+  //     )
+  //     .map((svc: any) => {
+  //       const assignment = activeAssignments.find((a: any) => String(a.id) === String(svc.id));
+  //       return {
+  //         ...svc,
+  //         price: assignment?.price || svc.price || svc.min_price || 0,
+  //         duration: assignment?.duration || svc.estimated_time || svc.min_time || 0,
+  //       };
+  //     });
+  // }, [allServices, selectedProfessional, selectedServices]);
 
   // Calculate selectedStaffServices, totalPrice and totalDuration for selectedProfessional to pass to sidebar
   const selectedStaffServices = useMemo(() => {
@@ -165,7 +165,7 @@ export default function Professionals() {
       )
     );
   };
-  const [isBottomSliderOpen, setIsBottomSliderOpen] = useState(false);
+  // const [isBottomSliderOpen, setIsBottomSliderOpen] = useState(false);
 
   return (
     <MainLayout
@@ -179,7 +179,7 @@ export default function Professionals() {
         />
       }
       renderButton={
-        isMobile && selectedProfessional && !isBottomSliderOpen ? (
+        isMobile && selectedProfessional ? (
           <button
             onClick={() => dispatch(nextStep())}
             className="aaravpos-btn"
@@ -240,11 +240,14 @@ export default function Professionals() {
                     onClick={() => {
                       if (isDisabled) return;
                       dispatch(toggleProfessional(p));
-                      dispatch(setSidebarOpen(true));
                       dispatch(setSelectedDate(null));
-                      if (isMobile) {
-                        setIsBottomSliderOpen(true);
-                      }
+                      dispatch(nextStep());
+                      // dispatch(toggleProfessional(p));
+                      // dispatch(setSidebarOpen(true));
+                      // dispatch(setSelectedDate(null));
+                      // if (isMobile) {
+                      //   setIsBottomSliderOpen(true);
+                      // }
                     }}
                     className={`booking-pro-card ${isDisabled ? "disabled" : isSelected ? "active" : ""}`}
                   >
@@ -289,8 +292,7 @@ export default function Professionals() {
             )}
           </div>
 
-          {/* Add-on Services Section */}
-          {!isMobile && selectedProfessional && remainingServices.length > 0 && (
+          {/* {!isMobile && selectedProfessional && remainingServices.length > 0 && (
             <div className="booking-addon-title-section">
               <h2 className="booking-addon-heading">
                 Anything you wish to add?
@@ -309,11 +311,9 @@ export default function Professionals() {
                       }}
                       className={`booking-addon-card ${isSelected ? "active" : ""}`}
                     >
-                      {/* TAX */}
                       {hasActiveTax(svc) && (
                         <span className="aaravpos-tax-badge">TAX</span>
                       )}
-                      {/* CONSENT */}
                       {isConsentRequiredService(svc) && (
                         <span className="aaravpos-consent-badge">
                           CONSENT
@@ -353,21 +353,17 @@ export default function Professionals() {
           )}
           {isMobile && isBottomSliderOpen && selectedProfessional && (
             <>
-              {/* Backdrop */}
               <div
                 onClick={() => setIsBottomSliderOpen(false)}
                 className="booking-slider-backdrop"
               />
-              {/* Sheet Content */}
               <div
                 className="booking-slider-sheet"
               >
-                {/* Drag handle */}
                 <div className="booking-slider-drag-handle-container">
                   <div className="booking-slider-drag-handle" />
                 </div>
 
-                {/* Header */}
                 <div className="booking-slider-header">
                   <div className="booking-slider-header-text">
                     <h3 className="booking-slider-title">
@@ -385,7 +381,6 @@ export default function Professionals() {
                   </button>
                 </div>
 
-                {/* Scrollable list of services */}
                 <div className="booking-slider-list">
                   {remainingServices.length > 0 ? (
                     remainingServices.map((svc: any) => {
@@ -423,7 +418,6 @@ export default function Professionals() {
                               </span>
                             </div>
                           </div>
-                          {/* Checkbox */}
                           <div className="booking-slider-item-checkbox-wrapper">
                             <input
                               type="checkbox"
@@ -443,7 +437,6 @@ export default function Professionals() {
                   )}
                 </div>
 
-                {/* Footer actions */}
                 <div className="booking-slider-footer">
                   <button
                     onClick={() => setIsBottomSliderOpen(false)}
@@ -454,7 +447,7 @@ export default function Professionals() {
                 </div>
               </div>
             </>
-          )}
+          )} */}
         </div>
       </div>
     </MainLayout>

@@ -2,8 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Search, X } from "lucide-react";
 import {
-  selectPrimaryService,
-  toggleService
+  selectPrimaryService
 } from "@/slices/serviceSlice";
 import Breadcrumb from "@/components/common/Breadcrumb";
 import MainLayout from "@/components/common/MainLayout";
