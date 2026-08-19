@@ -120,6 +120,9 @@ export default function Breadcrumb() {
     dispatch({ type: "RESET_ALL" });
   };
 
+
+
+
   const handlePrevNavigation = (): void => {
     if (currentIndex === 0 && outlets.length > 1) {
       clearAllData();
