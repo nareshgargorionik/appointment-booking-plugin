@@ -13,7 +13,7 @@ export type StepKey =
   | "services"
   | "professionals"
   | "time"
-  | "details"
+  // | "details"
   | "confirm"
   | "success";
 
@@ -21,7 +21,7 @@ export type Step =
   | "services"
   | "professionals"
   | "time"
-  | "details"
+  // | "details"
   | "confirm"
   | "success";
 

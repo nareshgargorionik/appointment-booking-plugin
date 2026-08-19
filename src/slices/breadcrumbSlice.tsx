@@ -4,9 +4,9 @@ import { Step, BreadcrumbState } from "@/types";
 // "details",
 const getStepsOrder = (isOrder: boolean): Step[] => {
     if (isOrder) {
-        return ["services", "professionals", "time", "details", "confirm", "success"];
+        return ["services", "professionals", "time", "confirm", "success"];
     }
-    return ["professionals", "services", "time", "details", "confirm", "success",];
+    return ["professionals", "services", "time", "confirm", "success",];
 };
 
 export const initialState: BreadcrumbState = {

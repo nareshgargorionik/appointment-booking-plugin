@@ -103,3 +103,11 @@ export const getPublicIP = async () => {
     return null;
   }
 };
+
+export const isValidEmail = (email?: string | null): boolean => {
+  if (!email || typeof email !== "string") return false;
+  const trimmed = email.trim();
+  if (trimmed.includes("..")) return false;
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9]+(?:\.[a-zA-Z0-9-]+)*\.[a-zA-Z]{2,}$/;
+  return emailRegex.test(trimmed);
+};

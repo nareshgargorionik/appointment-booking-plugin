@@ -12,6 +12,7 @@ import { setUserDetails, clearUserDetails } from "@/slices/appointmentSlice";
 import { fetchCustomer } from "@/services";
 import type { RootState } from "@/store";
 import { FormValues, FetchCustomerResponse, OutletRootState } from "@/types";
+import { isValidEmail } from "@/utils";
 
 const allowedCountries: CountryCode[] = ["IN", "US", "CA", "PH", "NZ", "AU", "CN"] as const;
 
@@ -67,7 +68,7 @@ export default function DetailsPage(): JSX.Element {
     const emailValue = watch("email");
 
     const isPhoneValid = phoneValue ? isValidPhoneNumber(phoneValue) : false;
-    const isEmailValid = emailValue ? /^\S+@\S+\.\S+$/.test(emailValue) : false;
+    const isEmailValid = isValidEmail(emailValue);
     const showPhoneAsterisk = !isEmailValid || isPhoneValid;
     const showEmailAsterisk = !isPhoneValid || isEmailValid;
 
@@ -82,8 +83,6 @@ export default function DetailsPage(): JSX.Element {
     }, [phoneValue, emailValue, isSubmitted, trigger]);
 
     const normalizePhone = (phone?: string): string => phone?.replace(/\s+/g, "") || "";
-
-    const isValidEmail = (email: string): boolean => /^\S+@\S+\.\S+$/.test(email);
 
     const onSubmit: SubmitHandler<FormValues> = (data): void => {
         const phone = isPhoneEmptyOrOnlyCallingCode(data.phone) ? "" : (data.phone ?? "");
@@ -215,7 +214,7 @@ export default function DetailsPage(): JSX.Element {
                                     rules={{
                                         validate: (value) => {
                                             const hasPhone = !isPhoneEmptyOrOnlyCallingCode(value);
-                                            const hasEmail = emailValue && /^\S+@\S+\.\S+$/.test(emailValue);
+                                            const hasEmail = isValidEmail(emailValue);
                                             if (!hasPhone && !hasEmail) {
                                                 return "Enter phone or email";
                                             }
@@ -273,7 +272,7 @@ export default function DetailsPage(): JSX.Element {
                                             if (!hasEmail && !hasPhone) {
                                                 return "Enter phone or email";
                                             }
-                                            if (hasEmail && !/^\S+@\S+\.\S+$/.test(value)) {
+                                            if (hasEmail && !isValidEmail(value)) {
                                                 return "Invalid email";
                                             }
                                             return true;

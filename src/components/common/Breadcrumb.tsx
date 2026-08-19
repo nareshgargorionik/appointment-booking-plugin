@@ -7,7 +7,6 @@ import {
   Clock3,
   CheckCircle2,
   ShoppingCart,
-  Info
 } from "lucide-react";
 import { goToStep, resetCompletedStepsFrom } from "@/slices/breadcrumbSlice";
 import { persistor } from "@/store";
@@ -24,14 +23,14 @@ type StepPage =
   | "services"
   | "professionals"
   | "time"
-  | "details"
+  // | "details"
   | "confirm";
 
 const SERVICE_RESET_MAP = {
   services: [clearSelectedProfessional, clearSlots, resetAppointment],
   professionals: [clearSelectedProfessional, clearSlots, resetAppointment],
   time: [clearSlots, resetAppointment],
-  details: [],
+  // details: [],
   confirm: [],
 };
 
@@ -39,7 +38,7 @@ const NORMAL_RESET_MAP = {
   professionals: [clearSlots, clearSelectedServices, resetAppointment],
   services: [clearSelectedServices, clearSlots, resetAppointment],
   time: [clearSlots, resetAppointment],
-  details: [],
+  // details: [],
   confirm: [],
 };
 
@@ -59,11 +58,11 @@ const SERVICE_STEPS: StepItem[] = [
     page: "time",
     icon: <Clock3 size={16} />,
   },
-  {
-    label: "Details",
-    page: "details",
-    icon: <Info size={16} />,
-  },
+  // {
+  //   label: "Details",
+  //   page: "details",
+  //   icon: <Info size={16} />,
+  // },
   {
     label: "Confirmation",
     page: "confirm",
@@ -120,6 +119,9 @@ export default function Breadcrumb() {
     persistor.purge();
     dispatch({ type: "RESET_ALL" });
   };
+
+
+
 
   const handlePrevNavigation = (): void => {
     if (currentIndex === 0 && outlets.length > 1) {

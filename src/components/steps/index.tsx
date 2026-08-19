@@ -7,7 +7,7 @@ import ServiceProfessionalPage from "@/components/steps/ServiceProfessionalPage"
 import ServicesPage from "@/components/steps/ServicesPage";
 import TimePage from "@/components/steps/TimePage";
 import ConfirmPage from "@/components/steps/ConfirmPage";
-import DetailsPage from "@/components/steps/DetailsPage";
+// import DetailsPage from "@/components/steps/DetailsPage";
 import SuccessPage from "@/components/steps/SuccessPage";
 import { RootState } from "@/store"; // adjust path as needed
 import { StepKey, PageMap } from "@/types";
@@ -24,7 +24,7 @@ function AppContent(): JSX.Element {
     services: isService ? ServicesPage : ServiceProfessionalPage,
     professionals: isService ? Professionals : ProfessionalServicePage,
     time: TimePage,
-    details: DetailsPage,
+    // details: DetailsPage,
     confirm: ConfirmPage,
     success: SuccessPage,
   };
