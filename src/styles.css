@@ -3440,7 +3440,7 @@
 .shimmer {
   position: relative;
   overflow: hidden;
-  background: #3a3a3a;
+  background: #ffff;
 }
 
 .shimmer::before {
@@ -5498,14 +5498,14 @@
 .dark .aaravpos-professional-dropdown-menu .aaravpos-professional-dropdown-name, .dark .aaravpos-calendar-btn,.dark .aaravpos-date-nav-btn, .dark .aaravpos-date-card, .dark .aaravpos-selected-professional, .dark .aaravpos-slot-section .aaravpos-slot-section-header .aaravpos-slot-section-title,
 .dark .aaravpos-slot-card.aaravpos-slot-card-default .aaravpos-slot-time, .dark .aaravpos-calendar-day.aaravpos-calendar-day-disabled.aaravpos-calendar-day-disabled:hover, .dark .aaravpos-paymentcard-title, 
 .dark .aaravpos-text-bold, .dark .aaravpos-slot-section-arrow,.dark .PhoneInput input.PhoneInputInput, .dark .aaravpos-order-service-name, .dark .aaravpos-success-title, .dark .aaravpos-label , .dark .aaravpos-service-name, .dark .aaravpos-empty-title,
-.dark .aaravpos-common-btn:hover, .dark .aaravpos-sidebar-close-btn , .dark .aaravpos-step-btn .aaravpos-step-icon.inactive, .dark .aaravpos-empty-services-title{
+.dark .aaravpos-common-btn:hover, .dark .aaravpos-sidebar-close-btn , .dark .aaravpos-step-btn .aaravpos-step-icon.inactive, .dark .aaravpos-empty-services-title, .dark .booking-confirm-field-label,.dark .booking-confirm-form-title, .dark .aaravpos-section-label{
   color: #F2F0EC;
 }
 
 .dark .aaravpos-service-description, .dark .aaravpos-service-price > span, .dark .booking-pro-card .booking-pro-role, .dark .aaravpos-professional-dropdown-menu .aaravpos-professional-dropdown-type,
 .dark .aaravpos-selected-professional .aaravpos-selected-professional-services, .dark .aaravpos-slot-card.aaravpos-slot-card-default .aaravpos-slot-status, .dark .aaravpos-outlet-info .aaravpos-outlet-address, .dark .aaravpos-sub-title,
-.dark .aaravpos-card-box .aaravpos-appointment-header .aaravpos-appointment-content .aaravpos-appointment-services, .dark .aaravpos-section-label, .dark .aaravpos-paymentcard-description, .dark .aaravpos-order-subtitle,
-.dark .aaravpos-order-detail.center, .dark .aaravpos-date-time-value,.dark .aaravpos-success-description, .dark .aaravpos-value, .dark .aaravpos-outlet-card-address, .dark .aaravpos-empty-text,.dark .booking-confirm-form-title, .dark .aaravpos-page-subtitle,
+.dark .aaravpos-card-box .aaravpos-appointment-header .aaravpos-appointment-content .aaravpos-appointment-services, .dark .aaravpos-paymentcard-description, .dark .aaravpos-order-subtitle,
+.dark .aaravpos-order-detail.center, .dark .aaravpos-date-time-value,.dark .aaravpos-success-description, .dark .aaravpos-value, .dark .aaravpos-outlet-card-address, .dark .aaravpos-empty-text, .dark .aaravpos-page-subtitle,
 .dark .aaravpos-date-close-btn, .dark .aaravpos-empty-services-text {
   color: #797877;
 }
@@ -5588,4 +5588,7 @@
 
 .dark .aaravpos-loader{
   border-top-color: var(--app-bg-hover) !important;
+}
+.dark .aaravpos-slot-section-header .shimmer , .dark .aaravpos-skeleton-block{
+ background: #3a3a3a !important;
 }
