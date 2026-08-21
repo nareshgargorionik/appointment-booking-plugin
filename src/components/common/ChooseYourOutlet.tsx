@@ -29,12 +29,7 @@ const StatusBadge = ({ status }: { status: boolean }) => (
 const OutletCard = ({ item, onSelect, selected, isLoading, isDisabled }: OutletCardProps) => {
   return (
     <div
-      className={`aaravpos-outlet-card
-        ${selected ? "selected" : ""}
-        ${!item.isOpen ? "closed" : ""}
-        ${isDisabled && !isLoading ? "loading-disabled" : ""}
-        ${isLoading ? "loading-card" : ""}
-      `}
+      className={`aaravpos-outlet-card ${selected ? "selected" : ""} ${!item.isOpen ? "closed" : ""} ${isDisabled && !isLoading ? "loading-disabled" : ""} ${isLoading ? "loading-card" : ""}`}
       onClick={() => {
         if (!isDisabled) {
           onSelect(String(item?.id));
@@ -43,7 +38,7 @@ const OutletCard = ({ item, onSelect, selected, isLoading, isDisabled }: OutletC
     >
       <div className="aaravpos-outlet-card-top">
         <StatusBadge status={item.isOpen} />
-        {isLoading && (
+        {true && (
           <div className="aaravpos-outlet-card-loader-corner">
             <div className="aaravpos-loader" />
           </div>

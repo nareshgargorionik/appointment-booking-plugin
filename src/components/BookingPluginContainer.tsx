@@ -6,14 +6,14 @@ import { fetchAllCategoriesAndStaffService } from "@/services";
 import { setOutletData, setOutletToken } from "@/slices/outletSlice";
 import { setOutletList } from "@/slices/outletListSlice";
 import { setServicePayload, setServiceLoading } from "@/slices/serviceSlice";
-import { setTheme } from "@/slices/themeSlice";
+import { setTheme, setIsDarkMode } from "@/slices/themeSlice";
 import { setIsOrder, goToStep } from "@/slices/breadcrumbSlice";
 import { applyTheme } from "@/utils/applyTheme";
 import ChooseYourOutlet from "@/components/common/ChooseYourOutlet";
 import DefaultAppointment from "@/components/steps";
 import type { AppDispatch } from "@/store";
 
-export const BookingPluginContainer: React.FC<AppointmentBookingPluginProps> = ({ bookingCode }) => {
+export const BookingPluginContainer: React.FC<AppointmentBookingPluginProps> = ({ bookingCode, isDarkMode = false }) => {
     const dispatch = useDispatch<AppDispatch>();
     const outlets = useSelector((state: any) => state.booking.outletList.outlets);
     const theme = useSelector((state: any) => state.booking.theme);
@@ -22,6 +22,10 @@ export const BookingPluginContainer: React.FC<AppointmentBookingPluginProps> = (
     const { id: outletId } = useSelector(
         (state: OutletRootState) => state.booking.outletDetails
     );
+
+    useEffect(() => {
+        dispatch(setIsDarkMode(isDarkMode));
+    }, [isDarkMode, dispatch]);
 
     const fetchInitialData = useCallback(async () => {
         try {
@@ -116,7 +120,10 @@ export const BookingPluginContainer: React.FC<AppointmentBookingPluginProps> = (
         );
     }
     return (
-        <div className="aaravpos-overflow-hidden">
+        <div
+            className={`aaravpos-overflow-hidden ${theme?.isDarkMode ? "dark" : "light"}`}
+            data-theme={theme?.isDarkMode ? "dark" : "light"}
+        >
             {outlets.length > 1 && !outletId ? (
                 <ChooseYourOutlet
                     outlets={outlets}

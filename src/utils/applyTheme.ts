@@ -13,6 +13,15 @@ export const hexToRgb = (hex: string) => {
 export const applyTheme = (theme?: ThemeSettings) => {
     if (!theme) return;
     const root = document.documentElement;
+
+    if (theme.isDarkMode) {
+        root.classList.add("dark");
+        root.setAttribute("data-theme", "dark");
+    } else {
+        root.classList.remove("dark");
+        root.setAttribute("data-theme", "light");
+    }
+
     if (theme?.button?.bg) {
         root.style.setProperty("--btn-bg", theme.button.bg);
     }

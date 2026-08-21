@@ -1,4 +1,4 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { ThemeSettings } from "@/types";
 
 const initialState: ThemeSettings = {
@@ -15,7 +15,8 @@ const initialState: ThemeSettings = {
         bgHover: '#4c6f6e',
         textHover: '#ffffff',
     },
-    isOpenSidebar: false
+    isOpenSidebar: false,
+    isDarkMode: false
 };
 
 const themeSlice = createSlice({
@@ -23,15 +24,21 @@ const themeSlice = createSlice({
     initialState,
     reducers: {
         setTheme: (state, action) => {
-            state.button = action.payload?.button;
-            state.colors = action.payload?.colors;
+            if (action.payload?.button) state.button = action.payload.button;
+            if (action.payload?.colors) state.colors = action.payload.colors;
+            if (action.payload?.isDarkMode !== undefined) {
+                state.isDarkMode = action.payload.isDarkMode;
+            }
+        },
+        setIsDarkMode: (state, action: PayloadAction<boolean>) => {
+            state.isDarkMode = action.payload;
         },
         setSidebarOpen: (state, action) => {
-            state.isOpenSidebar = action.payload
+            state.isOpenSidebar = action.payload;
         },
     },
 });
 
-export const { setTheme, setSidebarOpen } = themeSlice.actions;
+export const { setTheme, setIsDarkMode, setSidebarOpen } = themeSlice.actions;
 
 export default themeSlice.reducer;

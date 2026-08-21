@@ -166,7 +166,7 @@ export default function SuccessPage(): JSX.Element {
                                         {s.serviceName}
                                     </span>
 
-                                    <span className="aaravpos-value">
+                                    <span className="aaravpos-price">
                                         <CurrencyIcon size={14} />
                                         {Number(s.price).toFixed(2)}
                                     </span>

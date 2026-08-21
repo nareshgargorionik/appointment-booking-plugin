@@ -78,7 +78,8 @@ export interface ThemeSettings {
     bgHover: string;
     textHover: string;
   };
-  isOpenSidebar: boolean
+  isOpenSidebar: boolean;
+  isDarkMode?: boolean;
 }
 
 /* ─────────────────────────────────────────────────────────────
@@ -775,6 +776,7 @@ export interface FetchServiceResponse {
 
 export interface AppointmentBookingPluginProps {
   bookingCode: string;
+  isDarkMode?: boolean;
 }
 
 export interface ProfessionalSidebarProps {
