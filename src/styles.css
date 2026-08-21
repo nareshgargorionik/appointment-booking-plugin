@@ -3164,6 +3164,7 @@
   border: 1px solid rgb(0 0 0 / 10%);
   border-radius: 2px;
   overflow: hidden;
+  height: 40px;
 }
 
 .aaravpos-slot-section-header {
@@ -3174,6 +3175,7 @@
   cursor: pointer;
   background-color: var(--surface);
   transition: background-color 0.2s ease;
+  height: 24px;
 }
 
 .aaravpos-slot-section-header:hover {
@@ -3432,6 +3434,54 @@
   border-radius: 50%;
   animation: aaravpos-spin 0.8s linear infinite;
 }
+
+.shimmer {
+  position: relative;
+  overflow: hidden;
+  background: #3a3a3a;
+}
+
+.shimmer::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -150px;
+  height: 100%;
+  width: 150px;
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(255, 255, 255, 0.6),
+      transparent);
+  animation: shimmer 1.2s infinite;
+}
+
+
+.aaravpos-slot-skeleton-title {
+  width: 140px;
+  height: 20px;
+  border-radius: 6px;
+}
+
+.aaravpos-slot-skeleton-arrow {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+}
+
+
+@keyframes shimmer {
+  100% {
+    left: 100%;
+  }
+}
+
+@keyframes aaravpos-shimmer {
+  100% {
+    left: 100%;
+  }
+}
+
+
 
 /* =========================
    RESPONSIVE MEDIA QUERIES
@@ -5392,11 +5442,6 @@
   background-color: #000000;
   color: #F2F0EC;
 }
-/* .dark .booking-confirm-info-box, .dark .aaravpos-outlet-info, .dark .aaravpos-paymentcard-card.active,.dark .aaravpos-card-box,
-.dark .aaravpos-selected-professional, .dark .aaravpos-professional-dropdown-btn, .dark .aaravpos-slot-section-header, .dark .aaravpos-service-card, .dark .booking-pro-card, .dark .aaravpos-desktop-back-btn,
-.dark .aaravpos-search-input,.dark .aaravpos-cart-btn,.dark .aaravpos-slot-section-content,.dark .aaravpos-slot-card.aaravpos-slot-card-default{
-  background-color: #000000 !important;
-} */
 .dark .aaravpos-date-modal , .dark .aaravpos-date-modal-header, .dark .aaravpos-sidebar-mobile{
    background: #000000 !important;
 }
@@ -5428,7 +5473,8 @@
 }
 
 .dark .aaravpos-service-card, .dark .aaravpos-cart-btn, .dark .booking-pro-card, .dark .aaravpos-professional-dropdown-btn, .dark .aaravpos-professional-dropdown-menu, .dark .aaravpos-calendar-btn , .dark .aaravpos-date-nav-btn , .dark .aaravpos-date-card,
-.dark .aaravpos-selected-professional, .dark .aaravpos-slot-section-content, .dark .aaravpos-slot-section-header, .dark .aaravpos-slot-card.aaravpos-slot-card-default, .dark .aaravpos-paymentcard-card.active, .dark .booking-confirm-info-box{
+.dark .aaravpos-selected-professional, .dark .aaravpos-slot-section-content, .dark .aaravpos-slot-section-header, .dark .aaravpos-slot-card.aaravpos-slot-card-default, .dark .aaravpos-paymentcard-card.active, .dark .booking-confirm-info-box,
+.dark .aaravpos-slot-section-header{
  background-color: #000000;
  border-color: #2d3139;
 }
@@ -5450,7 +5496,7 @@
 .dark .aaravpos-professional-dropdown-menu .aaravpos-professional-dropdown-name, .dark .aaravpos-calendar-btn,.dark .aaravpos-date-nav-btn, .dark .aaravpos-date-card, .dark .aaravpos-selected-professional, .dark .aaravpos-slot-section .aaravpos-slot-section-header .aaravpos-slot-section-title,
 .dark .aaravpos-slot-card.aaravpos-slot-card-default .aaravpos-slot-time, .dark .aaravpos-calendar-day.aaravpos-calendar-day-disabled.aaravpos-calendar-day-disabled:hover, .dark .aaravpos-paymentcard-title, 
 .dark .aaravpos-text-bold, .dark .aaravpos-slot-section-arrow,.dark .PhoneInput input.PhoneInputInput, .dark .aaravpos-order-service-name, .dark .aaravpos-success-title, .dark .aaravpos-label , .dark .aaravpos-service-name, .dark .aaravpos-empty-title,
-.dark .aaravpos-common-btn:hover, .dark .aaravpos-sidebar-close-btn , .dark .aaravpos-step-btn .aaravpos-step-icon.inactive{
+.dark .aaravpos-common-btn:hover, .dark .aaravpos-sidebar-close-btn , .dark .aaravpos-step-btn .aaravpos-step-icon.inactive, .dark .aaravpos-empty-services-title{
   color: #F2F0EC;
 }
 
@@ -5458,7 +5504,7 @@
 .dark .aaravpos-selected-professional .aaravpos-selected-professional-services, .dark .aaravpos-slot-card.aaravpos-slot-card-default .aaravpos-slot-status, .dark .aaravpos-outlet-info .aaravpos-outlet-address, .dark .aaravpos-sub-title,
 .dark .aaravpos-card-box .aaravpos-appointment-header .aaravpos-appointment-content .aaravpos-appointment-services, .dark .aaravpos-section-label, .dark .aaravpos-paymentcard-description, .dark .aaravpos-order-subtitle,
 .dark .aaravpos-order-detail.center, .dark .aaravpos-date-time-value,.dark .aaravpos-success-description, .dark .aaravpos-value, .dark .aaravpos-outlet-card-address, .dark .aaravpos-empty-text,.dark .booking-confirm-form-title, .dark .aaravpos-page-subtitle,
-.dark .aaravpos-date-close-btn {
+.dark .aaravpos-date-close-btn, .dark .aaravpos-empty-services-text {
   color: #797877;
 }
 .dark span.aaravpos-service-price-right , .dark .aaravpos-price, .dark .aaravpos-total-price{
