@@ -123,7 +123,7 @@ export const BookingPluginContainer: React.FC<AppointmentBookingPluginProps> = (
     }
     if (!outlets.length && loading) {
         return (
-            <div className={`aaravpos-loader-wrapper ${theme?.isDarkMode ? "dark" : "light"}`}>
+            <div className={`aaravpos-loader-wrapper ${theme?.isDarkMode ? "dark" : "light"}`} style={{ height:700 }}>
                 <div className="aaravpos-loader" />
             </div>
         );

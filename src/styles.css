@@ -1746,7 +1746,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: calc(100dvh - 56px);
+  height: 700px;
   background: rgba(14, 14, 14, 0.55);
   backdrop-filter: blur(4px);
 }
@@ -2125,7 +2125,8 @@
 .aaravpos-loader-wrapper {
   position: absolute;
   right: 10px;
-  top: 50%;
+  /* top: 50%; */
+  top: 37%;
   transform: translateY(-50%);
   z-index: 999;
 }
@@ -2886,7 +2887,7 @@
   align-items: center;
   /* justify-content: center; */
   min-width: 26px;
-  min-height: 50px;
+  min-height: 48px;
   padding: 6px 8px;
   border-radius: 2px;
   cursor: pointer;
@@ -3393,7 +3394,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 12px 28px;
+  padding: 10px 28px;
   background: var(--btn-bg);
   color: var(--btn-text);
   border: 1px solid var(--btn-bg);
@@ -5366,6 +5367,12 @@
   cursor: not-allowed;
 }
 
+.skeleton-header{
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
 
 
 
@@ -5373,23 +5380,31 @@
 /* ==========================================================================
    CENTRALIZED DARK MODE THEME SYSTEM
    ========================================================================== */
+.dark .aaravpos-layout,.dark .aaravpos-container,.dark .aaravpos-sidebar{
+   background-color: #000000;
+}
 .dark .aaravpos-desktop-back-btn,.dark .aaravpos-sidebar, .dark .aaravpos-pro-card, .dark .aaravpos-success-card, .dark .aaravpos-outlet-card{
-  background-color: #1c1c1f;
+  background-color: #000000;
   border-color: #2d3139;
   color: #F2F0EC;
 }
 .aaravpos-loader-wrapper.dark{
-  background-color: #1c1c1f;
+  background-color: #000000;
   color: #F2F0EC;
 }
-.dark .aaravpos-container{
-  background-color: #1c1c1f;
+/* .dark .booking-confirm-info-box, .dark .aaravpos-outlet-info, .dark .aaravpos-paymentcard-card.active,.dark .aaravpos-card-box,
+.dark .aaravpos-selected-professional, .dark .aaravpos-professional-dropdown-btn, .dark .aaravpos-slot-section-header, .dark .aaravpos-service-card, .dark .booking-pro-card, .dark .aaravpos-desktop-back-btn,
+.dark .aaravpos-search-input,.dark .aaravpos-cart-btn,.dark .aaravpos-slot-section-content,.dark .aaravpos-slot-card.aaravpos-slot-card-default{
+  background-color: #000000 !important;
+} */
+.dark .aaravpos-date-modal , .dark .aaravpos-date-modal-header, .dark .aaravpos-sidebar-mobile{
+   background: #000000 !important;
 }
-.dark .aaravpos-layout , .dark .aaravpos-date-modal , .dark .aaravpos-date-modal-header{
-  background-color: #151517;
+.dark .aaravpos-slot-section{
+  border-color: #2d3139 !important;
 }
 .dark .aaravpos-supercategory-btn, .dark .aaravpos-outlet-info, .dark .aaravpos-card-box , .dark .booking-confirm-input{
-  background-color: #151517;
+  background-color: #000000;
   border: 1px solid #2d3139;
   color: #F2F0EC;
 }
@@ -5407,18 +5422,19 @@
   background: var(--app-bg-hover);
 }
 .dark .aaravpos-step-btn, .dark .aaravpos-date-modal , .dark .aaravpos-date-modal-header , .dark .aaravpos-outlet-info .aaravpos-outlet-name,  .dark .aaravpos-card-box .aaravpos-appointment-header .aaravpos-appointment-content .aaravpos-appointment-name,
-.dark .aaravpos-appointment-date-text, .dark .aaravpos-date-time-label, .dark .aaravpos-date-time-empty, .dark .aaravpos-summary-label, .dark .aaravpos-order-subtotal-label, .dark .aaravpos-title, .dark .aaravpos-outlet-card-title{
+.dark .aaravpos-appointment-date-text, .dark .aaravpos-date-time-label, .dark .aaravpos-date-time-empty, .dark .aaravpos-summary-label, .dark .aaravpos-order-subtotal-label, .dark .aaravpos-title, .dark .aaravpos-outlet-card-title,
+.dark .aaravpos-mobile-step-label, .dark .aaravpos-mobile-back-btn, .dark .aaravpos-order-title{
   color: #F2F0EC;
 }
 
 .dark .aaravpos-service-card, .dark .aaravpos-cart-btn, .dark .booking-pro-card, .dark .aaravpos-professional-dropdown-btn, .dark .aaravpos-professional-dropdown-menu, .dark .aaravpos-calendar-btn , .dark .aaravpos-date-nav-btn , .dark .aaravpos-date-card,
 .dark .aaravpos-selected-professional, .dark .aaravpos-slot-section-content, .dark .aaravpos-slot-section-header, .dark .aaravpos-slot-card.aaravpos-slot-card-default, .dark .aaravpos-paymentcard-card.active, .dark .booking-confirm-info-box{
- background-color: #1c1c1f;
+ background-color: #000000;
  border-color: #2d3139;
 }
 
 .dark .aaravpos-supercategory-btn:hover , .dark .aaravpos-desktop-back-btn:hover, .dark .aaravpos-count, .dark .aaravpos-supercategory-btn.active, .dark .aaravpos-date-card-active, .dark .aaravpos-slot-grid .aaravpos-slot-card.aaravpos-slot-card-selected,.dark .aaravpos-paymentcard-card.active .aaravpos-paymentcard-icon,
-.dark .aaravpos-paymentcard-check, .dark .aaravpos-success-icon{
+.dark .aaravpos-paymentcard-check, .dark .aaravpos-success-icon, .dark .aaravpos-cta-btn, .dark .aaravpos-common-btn, .dark .aaravpos-book-btn{
   border-color: var(--app-bg-hover);
   background-color: var(--app-bg-hover);
   color: #F2F0EC;
@@ -5427,33 +5443,38 @@
 .dark .aaravpos-step-btn.active , .dark .aaravpos-step-icon.active, .dark .aaravpos-order-detail.right, .dark .aaravpos-summary-value, .dark .aaravpos-order-subtotal-price{
   color: var(--app-bg-hover);
 }
-
+.dark .aaravpos-step-btn.active{
+  border-bottom-color:  var(--app-bg-hover);
+}
 .dark .aaravpos-step-btn.inactive:hover , .dark .aaravpos-count, .dark .aaravpos-cart-btn, .dark .aaravpos-service-title, .dark .booking-pro-card .booking-pro-name, .dark .aaravpos-professional-dropdown-btn, .dark .aaravpos-page-title,
 .dark .aaravpos-professional-dropdown-menu .aaravpos-professional-dropdown-name, .dark .aaravpos-calendar-btn,.dark .aaravpos-date-nav-btn, .dark .aaravpos-date-card, .dark .aaravpos-selected-professional, .dark .aaravpos-slot-section .aaravpos-slot-section-header .aaravpos-slot-section-title,
 .dark .aaravpos-slot-card.aaravpos-slot-card-default .aaravpos-slot-time, .dark .aaravpos-calendar-day.aaravpos-calendar-day-disabled.aaravpos-calendar-day-disabled:hover, .dark .aaravpos-paymentcard-title, 
-.dark .aaravpos-text-bold, .dark .aaravpos-slot-section-arrow,.dark .PhoneInput input.PhoneInputInput, .dark .aaravpos-order-service-name, .dark .aaravpos-success-title, .dark .aaravpos-label , .dark .aaravpos-service-name, .dark .aaravpos-empty-title{
+.dark .aaravpos-text-bold, .dark .aaravpos-slot-section-arrow,.dark .PhoneInput input.PhoneInputInput, .dark .aaravpos-order-service-name, .dark .aaravpos-success-title, .dark .aaravpos-label , .dark .aaravpos-service-name, .dark .aaravpos-empty-title,
+.dark .aaravpos-common-btn:hover, .dark .aaravpos-sidebar-close-btn , .dark .aaravpos-step-btn .aaravpos-step-icon.inactive{
   color: #F2F0EC;
 }
 
 .dark .aaravpos-service-description, .dark .aaravpos-service-price > span, .dark .booking-pro-card .booking-pro-role, .dark .aaravpos-professional-dropdown-menu .aaravpos-professional-dropdown-type,
 .dark .aaravpos-selected-professional .aaravpos-selected-professional-services, .dark .aaravpos-slot-card.aaravpos-slot-card-default .aaravpos-slot-status, .dark .aaravpos-outlet-info .aaravpos-outlet-address, .dark .aaravpos-sub-title,
 .dark .aaravpos-card-box .aaravpos-appointment-header .aaravpos-appointment-content .aaravpos-appointment-services, .dark .aaravpos-section-label, .dark .aaravpos-paymentcard-description, .dark .aaravpos-order-subtitle,
-.dark .aaravpos-order-detail.center, .dark .aaravpos-date-time-value,.dark .aaravpos-success-description, .dark .aaravpos-value, .dark .aaravpos-outlet-card-address, .dark .aaravpos-empty-text,.dark .booking-confirm-form-title{
+.dark .aaravpos-order-detail.center, .dark .aaravpos-date-time-value,.dark .aaravpos-success-description, .dark .aaravpos-value, .dark .aaravpos-outlet-card-address, .dark .aaravpos-empty-text,.dark .booking-confirm-form-title, .dark .aaravpos-page-subtitle,
+.dark .aaravpos-date-close-btn {
   color: #797877;
 }
 .dark span.aaravpos-service-price-right , .dark .aaravpos-price, .dark .aaravpos-total-price{
   color: var(--app-bg-hover);
 }
 .dark .aaravpos-search-input{
-  background-color: #1c1c1f;
+  background-color: #000000;
   border-color: #2d3139;
   color: #F2F0EC;
 }
 .dark .aaravpos-professional-dropdown-item:hover{
-  background-color: #2a2a2a;
+  background-color: rgb(42 42 42 / 59%);
 }
 .dark .aaravpos-slot-card-disabled{
-  background-color: #2f2f2fad;
+  background-color: rgb(19 19 19 / 98%);
+  border-color: #202020ba;
 }
 .dark .aaravpos-professional-dropdown-item-border{
   border-color: #2d3139 !important;
@@ -5468,7 +5489,7 @@
   background: #686868;
 }
 .dark .aaravpos-date-modal{
-  box-shadow: 0 20px 45px rgb(0 0 0);
+  box-shadow: 0 20px 45px rgb(49 49 49 / 51%);
 }
 .dark .aaravpos-appointment-date{
   border-color: #2d3139 !important;
@@ -5483,9 +5504,9 @@
   background:linear-gradient(86deg, #000000b5, rgb(0 0 0 / 75%), #000000de)
 }
 .dark .booking-confirm-input.PhoneInput input.PhoneInputInput, .dark .booking-confirm-input{
-  background-color: #151517 !important;
+  background-color: #000000 !important;
 }
-.dark .aaravpos-order-section-title, .dark .aaravpos-search-clear:hover{
+.dark .aaravpos-order-section-title, .dark .aaravpos-search-clear:hover, .dark .skeleton-header .aaravpos-sidebar-close-btn{
   color: #b0b0b0;
 }
 .dark .aaravpos-outlet-card.closed{
@@ -5499,4 +5520,24 @@
   width: 12px;
   height: 12px;
   border: 3px solid #e5e5e5;
+}
+.dark .booking-pro-card.disabled{
+  opacity: 0.6;
+  background: rgb(34 34 34 / 66%) !important;
+}
+.dark .aaravpos-common-btn:disabled{
+  background-color: #2f2f2fad !important;
+}
+
+.dark .aaravpos-success-card{
+  background-color: rgb(19 19 19 / 98%);
+  border: 1px solid #202020ba;
+}
+
+.dark .aaravpos-calendar-btn{
+  border: 1px solid #2d3139;
+}
+
+.dark .aaravpos-loader{
+  border-top-color: var(--app-bg-hover) !important;
 }

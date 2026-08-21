@@ -1,4 +1,8 @@
 import type { JSX } from "react";
+import { useDispatch } from "react-redux";
+import type { AppDispatch } from "@/store";
+import { X } from "lucide-react";
+import { setSidebarOpen } from "@/slices/themeSlice";
 
 interface SkeletonBlockProps {
   className?: string;
@@ -12,16 +16,21 @@ const SkeletonBlock = ({ className, style }: SkeletonBlockProps): JSX.Element =>
 );
 
 export default function ServiceSidebarSkeleton(): JSX.Element {
+  const dispatch = useDispatch<AppDispatch>();
   return (
     <div className="aaravpos-sidebar-skeleton">
-      {/* "Your Order" title skeleton */}
-      <SkeletonBlock className="aaravpos-skeleton-title" />
-
+      <div className="skeleton-header">
+        {/* "Your Order" title skeleton */}
+        <SkeletonBlock className="aaravpos-skeleton-title" />
+        <button className="aaravpos-sidebar-close-btn" onClick={() => dispatch(setSidebarOpen(false))}>
+          <X size={18} />
+        </button>
+      </div>
       {/* Outlet Name subtitle skeleton */}
       <div className="aaravpos-skeleton-subtitle-wrapper">
         <SkeletonBlock className="aaravpos-skeleton-subtitle" />
       </div>
-
+      
       {/* Selected services list skeleton */}
       <div className="aaravpos-skeleton-list">
         {Array.from({ length: 3 }).map((_, index) => (
