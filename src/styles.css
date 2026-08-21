@@ -5430,7 +5430,7 @@
 
 .dark .aaravpos-step-btn.inactive:hover , .dark .aaravpos-count, .dark .aaravpos-cart-btn, .dark .aaravpos-service-title, .dark .booking-pro-card .booking-pro-name, .dark .aaravpos-professional-dropdown-btn, .dark .aaravpos-page-title,
 .dark .aaravpos-professional-dropdown-menu .aaravpos-professional-dropdown-name, .dark .aaravpos-calendar-btn,.dark .aaravpos-date-nav-btn, .dark .aaravpos-date-card, .dark .aaravpos-selected-professional, .dark .aaravpos-slot-section .aaravpos-slot-section-header .aaravpos-slot-section-title,
-.dark .aaravpos-slot-card.aaravpos-slot-card-default .aaravpos-slot-time, .dark .aaravpos-calendar-day.aaravpos-calendar-day-disabled.aaravpos-calendar-day-disabled:hover, .dark .aaravpos-paymentcard-title, .dark .booking-confirm-form-title,
+.dark .aaravpos-slot-card.aaravpos-slot-card-default .aaravpos-slot-time, .dark .aaravpos-calendar-day.aaravpos-calendar-day-disabled.aaravpos-calendar-day-disabled:hover, .dark .aaravpos-paymentcard-title, 
 .dark .aaravpos-text-bold, .dark .aaravpos-slot-section-arrow,.dark .PhoneInput input.PhoneInputInput, .dark .aaravpos-order-service-name, .dark .aaravpos-success-title, .dark .aaravpos-label , .dark .aaravpos-service-name, .dark .aaravpos-empty-title{
   color: #F2F0EC;
 }
@@ -5438,7 +5438,7 @@
 .dark .aaravpos-service-description, .dark .aaravpos-service-price > span, .dark .booking-pro-card .booking-pro-role, .dark .aaravpos-professional-dropdown-menu .aaravpos-professional-dropdown-type,
 .dark .aaravpos-selected-professional .aaravpos-selected-professional-services, .dark .aaravpos-slot-card.aaravpos-slot-card-default .aaravpos-slot-status, .dark .aaravpos-outlet-info .aaravpos-outlet-address, .dark .aaravpos-sub-title,
 .dark .aaravpos-card-box .aaravpos-appointment-header .aaravpos-appointment-content .aaravpos-appointment-services, .dark .aaravpos-section-label, .dark .aaravpos-paymentcard-description, .dark .aaravpos-order-subtitle,
-.dark .aaravpos-order-detail.center, .dark .aaravpos-date-time-value,.dark .aaravpos-success-description, .dark .aaravpos-value, .dark .aaravpos-outlet-card-address, .dark .aaravpos-empty-text{
+.dark .aaravpos-order-detail.center, .dark .aaravpos-date-time-value,.dark .aaravpos-success-description, .dark .aaravpos-value, .dark .aaravpos-outlet-card-address, .dark .aaravpos-empty-text,.dark .booking-confirm-form-title{
   color: #797877;
 }
 .dark span.aaravpos-service-price-right , .dark .aaravpos-price, .dark .aaravpos-total-price{
