@@ -5482,7 +5482,7 @@
 }
 
 .dark .aaravpos-supercategory-btn:hover , .dark .aaravpos-desktop-back-btn:hover, .dark .aaravpos-count, .dark .aaravpos-supercategory-btn.active, .dark .aaravpos-date-card-active, .dark .aaravpos-slot-grid .aaravpos-slot-card.aaravpos-slot-card-selected,.dark .aaravpos-paymentcard-card.active .aaravpos-paymentcard-icon,
-.dark .aaravpos-paymentcard-check, .dark .aaravpos-success-icon, .dark .aaravpos-cta-btn, .dark .aaravpos-common-btn, .dark .aaravpos-book-btn{
+.dark .aaravpos-paymentcard-check, .dark .aaravpos-success-icon, .dark .aaravpos-cta-btn, .dark .aaravpos-common-btn, .dark .aaravpos-book-btn , .dark .aaravpos-calendar-day.aaravpos-calendar-day-selected{
   border-color: var(--app-bg-hover);
   background-color: var(--app-bg-hover);
   color: #F2F0EC;
