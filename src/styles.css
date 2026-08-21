@@ -3195,6 +3195,8 @@
 
 .aaravpos-slot-section-arrow {
   transition: transform 0.2s ease;
+  display: flex;
+  align-items: center;
 }
 
 .aaravpos-slot-section-arrow-open {
