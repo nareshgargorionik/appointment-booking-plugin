@@ -744,34 +744,20 @@ function SlotSection({
     <div className="aaravpos-slot-section">
       <div onClick={onToggle} className="aaravpos-slot-section-header">
         <div className="aaravpos-slot-section-title">
-          <span>{icon}</span>
-
-          {label}
+          <span>{icon}</span> {label}
         </div>
-
-        <span
-          className={`aaravpos-slot-section-arrow ${isOpen ? "aaravpos-slot-section-arrow-open" : ""
-            }`}
-        >
+        <span className={`aaravpos-slot-section-arrow ${isOpen ? "aaravpos-slot-section-arrow-open" : ""}`}>
           <ChevronDown />
         </span>
       </div>
-
       {isOpen && (
         <div className="aaravpos-slot-section-content">
           <div className="aaravpos-slot-grid">
             {slots.map((slot: SlotItem) => {
-              const globalIndex = allSlots.findIndex(
-                (s: SlotItem) => s.id === slot.id,
-              );
-
+              const globalIndex = allSlots.findIndex((s: SlotItem) => s.id === slot.id);
               const isSelected = selectedSlotIndexes.includes(globalIndex);
-
               const isOnBreak = slot.disabled;
-
-              const isDisabled =
-                slot.isBooked || slot.status !== "AVAILABLE" || isOnBreak;
-
+              const isDisabled = slot.isBooked || slot.status !== "AVAILABLE" || isOnBreak;
               return (
                 <div
                   key={slot.id}
@@ -790,13 +776,8 @@ function SlotSection({
                   <span className="aaravpos-slot-time">
                     {slot.start_time_12h}
                   </span>
-
                   <span className="aaravpos-slot-status">
-                    {slot.disabled
-                      ? ""
-                      : slot.isBooked
-                        ? "Booked"
-                        : "Available"}
+                    {slot.disabled ? "" : slot.isBooked ? "Booked" : "Available"}
                   </span>
                 </div>
               );
@@ -830,14 +811,12 @@ function ProfessionalDropdown({
         <span className="aaravpos-professional-dropdown-text">
           Choose Professional
         </span>
-
         <ChevronDown
           size={18}
           className={`aaravpos-professional-dropdown-icon ${open ? "aaravpos-professional-dropdown-icon-open" : ""
             }`}
         />
       </button>
-
       {open && (
         <div className="aaravpos-professional-dropdown-menu">
           {professionals
@@ -863,19 +842,15 @@ function ProfessionalDropdown({
                 ) : (
                   <div
                     className="aaravpos-professional-dropdown-avatar-placeholder"
-                    style={{
-                      background: pro.color || "#111",
-                    }}
+                    style={{ background: pro.color || "#111" }}
                   >
                     {getUserName(pro.name)}
                   </div>
                 )}
-
                 <div>
                   <p className="aaravpos-professional-dropdown-name">
                     {pro.name}
                   </p>
-
                   <p className="aaravpos-professional-dropdown-type">
                     {pro.staff_type}
                   </p>
