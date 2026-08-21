@@ -38,7 +38,7 @@ const OutletCard = ({ item, onSelect, selected, isLoading, isDisabled }: OutletC
     >
       <div className="aaravpos-outlet-card-top">
         <StatusBadge status={item.isOpen} />
-        {true && (
+        {isLoading && (
           <div className="aaravpos-outlet-card-loader-corner">
             <div className="aaravpos-loader" />
           </div>

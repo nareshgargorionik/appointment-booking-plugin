@@ -24,6 +24,15 @@ export const BookingPluginContainer: React.FC<AppointmentBookingPluginProps> = (
     );
 
     useEffect(() => {
+        const savedDarkMode = localStorage.getItem("isDarkMode");
+        if (savedDarkMode !== null) {
+            try {
+                dispatch(setIsDarkMode(JSON.parse(savedDarkMode)));
+                return;
+            } catch (e) {
+                console.error("Error parsing isDarkMode from localStorage:", e);
+            }
+        }
         dispatch(setIsDarkMode(isDarkMode));
     }, [isDarkMode, dispatch]);
 
@@ -114,7 +123,7 @@ export const BookingPluginContainer: React.FC<AppointmentBookingPluginProps> = (
     }
     if (!outlets.length && loading) {
         return (
-            <div className="aaravpos-loader-wrapper">
+            <div className={`aaravpos-loader-wrapper ${theme?.isDarkMode ? "dark" : "light"}`}>
                 <div className="aaravpos-loader" />
             </div>
         );

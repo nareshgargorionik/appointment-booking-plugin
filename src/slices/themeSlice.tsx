@@ -1,6 +1,18 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { ThemeSettings } from "@/types";
 
+const getInitialDarkMode = (): boolean => {
+    try {
+        const saved = localStorage.getItem("isDarkMode");
+        if (saved !== null) {
+            return JSON.parse(saved);
+        }
+    } catch (e) {
+        console.error("Error reading isDarkMode from localStorage:", e);
+    }
+    return false;
+};
+
 const initialState: ThemeSettings = {
     button: {
         bg: '#d7263d',
@@ -16,7 +28,7 @@ const initialState: ThemeSettings = {
         textHover: '#ffffff',
     },
     isOpenSidebar: false,
-    isDarkMode: false
+    isDarkMode: getInitialDarkMode()
 };
 
 const themeSlice = createSlice({
@@ -28,10 +40,20 @@ const themeSlice = createSlice({
             if (action.payload?.colors) state.colors = action.payload.colors;
             if (action.payload?.isDarkMode !== undefined) {
                 state.isDarkMode = action.payload.isDarkMode;
+                try {
+                    localStorage.setItem("isDarkMode", JSON.stringify(action.payload.isDarkMode));
+                } catch (e) {
+                    console.error("Error writing isDarkMode to localStorage:", e);
+                }
             }
         },
         setIsDarkMode: (state, action: PayloadAction<boolean>) => {
             state.isDarkMode = action.payload;
+            try {
+                localStorage.setItem("isDarkMode", JSON.stringify(action.payload));
+            } catch (e) {
+                console.error("Error writing isDarkMode to localStorage:", e);
+            }
         },
         setSidebarOpen: (state, action) => {
             state.isOpenSidebar = action.payload;
