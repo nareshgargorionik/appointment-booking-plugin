@@ -109,6 +109,7 @@
   justify-content: space-between;
   gap: 12px;
   height: 100%;
+  padding-right: 10px;
 }
 
 .aaravpos-paymentcard-title {
@@ -5512,8 +5513,8 @@
 .dark span.aaravpos-service-price-right , .dark .aaravpos-price, .dark .aaravpos-total-price, .dark .aaravpos-appointment-price{
   color: var(--app-bg-hover);
 }
-.dark .aaravpos-search-input{
-  background-color: #000000;
+.dark .aaravpos-search-input, .dark .aaravpos-barber-desktop-stepper .aaravpos-barber-desktop-back-btn{
+  background-color: #000000 !important;
   border-color: #2d3139;
   color: #F2F0EC;
 }
@@ -5552,7 +5553,7 @@
   background:linear-gradient(86deg, #000000b5, rgb(0 0 0 / 75%), #000000de)
 }
 .dark .booking-confirm-input.PhoneInput input.PhoneInputInput, .dark .booking-confirm-input{
-  background-color: #000000 !important;
+  background: transparent !important;
 }
 .dark .aaravpos-order-section-title, .dark .aaravpos-search-clear:hover, .dark .skeleton-header .aaravpos-sidebar-close-btn{
   color: #b0b0b0;
