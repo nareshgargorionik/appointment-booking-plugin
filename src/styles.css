@@ -5509,7 +5509,7 @@
 .dark .aaravpos-date-close-btn, .dark .aaravpos-empty-services-text {
   color: #797877;
 }
-.dark span.aaravpos-service-price-right , .dark .aaravpos-price, .dark .aaravpos-total-price{
+.dark span.aaravpos-service-price-right , .dark .aaravpos-price, .dark .aaravpos-total-price, .dark .aaravpos-appointment-price{
   color: var(--app-bg-hover);
 }
 .dark .aaravpos-search-input{
